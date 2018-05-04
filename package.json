@@ -1,0 +1,23 @@
+{
+    "name": "ORS-ICO",
+    "version": "2.0.0",
+    "description": "ORS ICO Solidity Smart Contracts",
+    "author": "SICOS",
+    "license": "UNLICENSED",
+    "repository": {
+        "type": "git",
+        "url": "http://46.101.229.186:3000/sicos/ors-ico"
+    },
+    "dependencies": {
+        "chai": "4.1.2",
+        "chai-as-promised": "7.1.1",
+        "chai-bignumber": "2.0.2",
+        "ethereumjs-abi": "0.6.5",
+        "ethereumjs-util": "5.2.0",
+        "ganache-cli": "6.1.0",
+        "solhint": "1.1.10",
+        "truffle": "4.1.7",
+        "truffle-flattener": "^1.2.5",
+        "zeppelin-solidity": "1.9.0"
+    }
+}

@@ -1,0 +1,22 @@
+ICO
+    setRate
+    Finalizable
+    Capped
+    Timed
+    Minted
+    TeamAccount
+    Airdrop (Post Presale)
+    EIDOO-Interface
+    KYC-Interface
+
+    Phase:
+        1. Main sale
+        2. Presale Distribution
+        3. Team share
+
+    Unsold tokens -> company wallet
+
+DevNet
+    ORSToken
+        0x266CF0354f049Ab7cF41EF7CBc04AE505ad5E3B5
+    ORSTokenSale
