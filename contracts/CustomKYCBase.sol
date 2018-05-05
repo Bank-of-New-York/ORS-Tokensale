@@ -1,7 +1,6 @@
 pragma solidity ^0.4.19;
 
-import "../../zeppelin-solidity/contracts/math/SafeMath.sol";
-//import "./SafeMath.sol";
+import "../zeppelin-solidity/contracts/math/SafeMath.sol";
 
 // Abstract base contract
 contract KYCBase {
@@ -19,7 +18,7 @@ contract KYCBase {
     }
 
     // Must be implemented in descending contract to assign tokens to the buyers. Called after the KYC verification is passed
-    function releaseTokensTo(address buyer, address signer) internal returns(bool);  // Patched
+    function releaseTokensTo(address buyer, address signer) internal returns(bool);  // Custom adaption
 
     // This method can be overridden to enable some sender to buy token for a different address
     function senderAllowedFor(address buyer)
@@ -54,7 +53,7 @@ contract KYCBase {
             require(totalPayed <= maxAmount);
             alreadyPayed[buyerId] = totalPayed;
             KycVerified(signer, buyerAddress, buyerId, maxAmount);
-            return releaseTokensTo(buyerAddress, signer);  // Patched
+            return releaseTokensTo(buyerAddress, signer);  // Custom adaption
         }
     }
 

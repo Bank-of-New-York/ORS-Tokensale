@@ -152,6 +152,23 @@ module.exports = (() => {
         throw new Error("Contract creation should have failed but didn't.");
     };
 
+    const increaseTime = secs =>
+        new Promise((resolve, reject) => {
+                web3.currentProvider.sendAsync(
+                    {jsonrpc: "2.0", method: "evm_increaseTime", params: [secs], id: now()},
+                    error => {
+                        if (error) { reject(error); }
+                        else {
+                            web3.currentProvider.sendAsync(
+                                {jsonrpc: "2.0", method: "evm_mine", id: now() + 1},
+                                (error, result) => {
+                                    if (error) { reject(error); }
+                                    else { resolve(result); }
+                                });
+                        }
+                    });
+            });
+
     // Create a random address.
     const randomAddr = () => {
         let digits = [];
@@ -168,9 +185,11 @@ module.exports = (() => {
         sleep,
         duration,
         currency,
+        log,
         logGas,
         rejectTx,
         rejectDeploy,
+        increaseTime,
         randomAddr,
     };
 })();

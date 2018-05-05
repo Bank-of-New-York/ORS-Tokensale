@@ -1,10 +1,9 @@
 "use strict";
 
-const ORSToken = artifacts.require("./ORSToken.sol");
-const Callable = artifacts.require("./CallableMock.sol");
-const ReToken = artifacts.require("./ReTokenMock.sol");
+const ORSToken = artifacts.require("ORSToken.sol");
 
-const {expect} = require("chai").use(require("chai-bignumber")(web3.BigNumber));
+const BN = web3.BigNumber;
+const {expect} = require("chai").use(require("chai-bignumber")(BN));
 const {rejectTx, rejectDeploy} = require("./helpers/common");
 
 
@@ -23,7 +22,7 @@ contract("ORSToken", ([owner, holder, trustee, recipient, anyone]) => {
 
         describe("with invalid parameters", () => {
 
-            it("should fail if cap is zero", async () => {
+            it("fails if cap is zero", async () => {
                 await rejectDeploy(deployToken(0));
             });
         });
@@ -146,13 +145,11 @@ contract("ORSToken", ([owner, holder, trustee, recipient, anyone]) => {
 
     describe("while unpaused", () => {
         let token;
-        let callable;
 
         before("deploy and mint", async () => {
             token = await ORSToken.new(2525, {from: owner});
             await token.unpause({from: owner});
             await token.mint(holder, 1000, {from: owner});
-            callable = await Callable.new();
         });
 
         describe("approve/transfer", () => {
@@ -200,61 +197,6 @@ contract("ORSToken", ([owner, holder, trustee, recipient, anyone]) => {
                 expect(await token.balanceOf(recipient)).to.be.bignumber.equal(recipientsBalance.plus(10));
                 expect(await token.allowance(holder, trustee)).to.be.bignumber.equal(allowance.minus(10));
             });
-
-            it("permits to approve and call", async () => {
-                let data = callable.contract.callback.getData(1111);
-                await token.approveAndCall(callable.address, 500, data, {from: holder, value: 11});
-                expect(await token.allowance(holder, callable.address)).to.be.bignumber.equal(500);
-                expect(await callable.lastMsgSender()).to.be.bignumber.equal(token.address);
-                expect(await callable.lastMsgValue()).to.be.bignumber.equal(11);
-                expect(await callable.lastArgument()).to.be.bignumber.equal(1111);
-            });
-
-            it("permits to increase approval and call", async () => {
-                let allowance = await token.allowance(holder, callable.address);
-                let data = callable.contract.callback.getData(2222);
-                await token.increaseApprovalAndCall(callable.address, 100, data, {from: holder, value: 22});
-                expect(await token.allowance(holder, callable.address)).to.be.bignumber.equal(allowance.plus(100));
-                expect(await callable.lastMsgSender()).to.be.bignumber.equal(token.address);
-                expect(await callable.lastMsgValue()).to.be.bignumber.equal(22);
-                expect(await callable.lastArgument()).to.be.bignumber.equal(2222);
-            });
-
-            it("permits to decrease approval and call", async () => {
-                let allowance = await token.allowance(holder, callable.address);
-                let data = callable.contract.callback.getData(3333);
-                await token.decreaseApprovalAndCall(callable.address, 100, data, {from: holder, value: 33});
-                expect(await token.allowance(holder, callable.address)).to.be.bignumber.equal(allowance.minus(100));
-                expect(await callable.lastMsgSender()).to.be.bignumber.equal(token.address);
-                expect(await callable.lastMsgValue()).to.be.bignumber.equal(33);
-                expect(await callable.lastArgument()).to.be.bignumber.equal(3333);
-            });
-
-            it("permits to transfer and call", async () => {
-                let holdersBalance = await token.balanceOf(holder);
-                let callablesBalance = await token.balanceOf(callable.address);
-                let data = callable.contract.callback.getData(4444);
-                await token.transferAndCall(callable.address, 10, data, {from: holder, value: 44});
-                expect(await token.balanceOf(holder)).to.be.bignumber.equal(holdersBalance.minus(10));
-                expect(await token.balanceOf(callable.address)).to.be.bignumber.equal(callablesBalance.plus(10));
-                expect(await callable.lastMsgSender()).to.be.bignumber.equal(token.address);
-                expect(await callable.lastMsgValue()).to.be.bignumber.equal(44);
-                expect(await callable.lastArgument()).to.be.bignumber.equal(4444);
-            });
-
-            it("permits to transfer from and call", async () => {
-                let holdersBalance = await token.balanceOf(holder);
-                let callablesBalance = await token.balanceOf(callable.address);
-                let allowance = await token.allowance(holder, trustee);
-                let data = callable.contract.callback.getData(5555);
-                await token.transferFromAndCall(holder, callable.address, 10, data, {from: trustee, value: 55});
-                expect(await token.balanceOf(holder)).to.be.bignumber.equal(holdersBalance.minus(10));
-                expect(await token.balanceOf(callable.address)).to.be.bignumber.equal(callablesBalance.plus(10));
-                expect(await token.allowance(holder, trustee)).to.be.bignumber.equal(allowance.minus(10));
-                expect(await callable.lastMsgSender()).to.be.bignumber.equal(token.address);
-                expect(await callable.lastMsgValue()).to.be.bignumber.equal(55);
-                expect(await callable.lastArgument()).to.be.bignumber.equal(5555);
-            });
         });
 
         describe("burning", () => {
@@ -281,7 +223,6 @@ contract("ORSToken", ([owner, holder, trustee, recipient, anyone]) => {
 
     describe("while paused", () => {
         let token;
-        let callable;
 
         before("deploy and mint and approve", async () => {
             const cap = 2525;
@@ -290,7 +231,6 @@ contract("ORSToken", ([owner, holder, trustee, recipient, anyone]) => {
             await token.mint(holder, 1000, {from: owner});
             await token.approve(trustee, 400, {from: holder});
             await token.pause({from: owner});
-            callable = await Callable.new();
         });
 
         describe("approve/transfer", () => {
@@ -314,67 +254,27 @@ contract("ORSToken", ([owner, holder, trustee, recipient, anyone]) => {
             it("forbids to transfer from", async () => {
                 await rejectTx(token.transferFrom(holder, recipient, 10, {from: trustee}));
             });
-
-            it("forbids to approve and call", async () => {
-                let data = callable.contract.callback.getData(1111);
-                await rejectTx(token.approveAndCall(callable.address, 500, data, {from: holder, value: 11}));
-            });
-
-            it("forbids to increase approval and call", async () => {
-                let data = callable.contract.callback.getData(2222);
-                await rejectTx(token.increaseApprovalAndCall(callable.address, 100, data, {from: holder, value: 22}));
-            });
-
-            it("forbids to decrease approval and call", async () => {
-                let data = callable.contract.callback.getData(3333);
-                await rejectTx(token.decreaseApprovalAndCall(callable.address, 100, data, {from: holder, value: 33}));
-            });
-
-            it("forbids to transfer and call", async () => {
-                let data = callable.contract.callback.getData(4444);
-                await rejectTx(token.transferAndCall(callable.address, 10, data, {from: holder, value: 44}));
-            });
-
-            it("forbids to transfer from and call", async () => {
-                let data = callable.contract.callback.getData(5555);
-                await rejectTx(token.transferFromAndCall(holder, callable.address, 10, data, {from: trustee, value: 55}));
-            });
         });
 
         describe("burning", () => {
 
-            it("forbids to burn", async () => {
-                await rejectTx(token.burn(10, {from: holder}));
+            it("permits to burn", async () => {
+                let totalSupply = await token.totalSupply();
+                let balance = await token.balanceOf(holder);
+                await token.burn(10, {from: holder});
+                expect(await token.totalSupply()).to.be.bignumber.equal(totalSupply.minus(10));
+                expect(await token.balanceOf(holder)).to.be.bignumber.equal(balance.minus(10));
             });
 
-            it("forbids to burn from", async () => {
-                await rejectTx(token.burnFrom(holder, 10, {from: trustee}));
+            it("permits to burn from", async () => {
+                let totalSupply = await token.totalSupply();
+                let balance = await token.balanceOf(holder);
+                let allowance = await token.allowance(holder, trustee);
+                await token.burnFrom(holder, 10, {from: trustee});
+                expect(await token.totalSupply()).to.be.bignumber.equal(totalSupply.minus(10));
+                expect(await token.balanceOf(holder)).to.be.bignumber.equal(balance.minus(10));
+                expect(await token.allowance(holder, trustee)).to.be.bignumber.equal(allowance.minus(10));
             });
-        });
-    });
-
-    describe("calling another contract", () => {
-        let token;
-        let reToken;
-
-        before("deploy and mint", async () => {
-            const cap = 2525;
-            token = await ORSToken.new(cap, {from: owner});
-            await token.unpause({from: owner});
-            await token.mint(holder, 1000, {from: owner});
-            reToken = await ReToken.new();
-        });
-
-        it("may transfer tokens back", async () => {
-            let data = reToken.contract.transferBack.getData(token.address);
-            await token.transferAndCall(reToken.address, 500, data, {from: holder});
-            expect(await token.balanceOf(token.address)).to.be.bignumber.equal(500);
-        });
-
-        it("may not transfer tokens recursive", async () => {
-            let data = reToken.contract.transferRecursive.getData(token.address);
-            await reToken.setData(data);
-            await rejectTx(token.transferAndCall(reToken.address, 1, data, {from: holder}));
         });
     });
 

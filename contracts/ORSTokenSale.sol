@@ -1,8 +1,8 @@
 pragma solidity 0.4.23;
 
 import "./ORSToken.sol";
+import "./CustomKYCBase.sol";
 import "../eidoo-icoengine/contracts/ICOEngineInterface.sol";
-import "../eidoo-icoengine/contracts/KYCBase.sol";
 import "../zeppelin-solidity/contracts/math/SafeMath.sol";
 import "../zeppelin-solidity/contracts/ownership/Ownable.sol";
 
@@ -13,30 +13,39 @@ contract ORSTokenSale is KYCBase, ICOEngineInterface, Ownable {
 
     using SafeMath for uint;
 
-    uint constant public MAINSALE_CAP = 500000000e18;   // 500,000,000 e18
-    uint constant public PRESALE_CAP = 0;               // TBD!
-    uint constant public BONUS_CAP = 64460000e18;       //  64,460,000 e18
-    uint constant public TEAM_CAP = 83333333e18;        //  83,333,333 e18
-    uint constant public COMPANY_CAP = 127206667e18;    // 127,206,667 e18
-    uint constant public ADVISORS_CAP = 58333333e18;    //  58,333,333 e18
+    // Maximum token amounts of each pool
+    uint constant public PRESALE_CAP = 250000000e18;                 // 250,000,000 e18
+    uint constant public MAINSALE_CAP = 500000000e18 - PRESALE_CAP;  // 250,000,000 e18
+    uint constant public BONUS_CAP = 64460000e18;                    //  64,460,000 e18
 
-    uint public mainsaleRemaining = MAINSALE_CAP;
+    // Granted token shares that will be minted upon finalization
+    uint constant public TEAM_SHARE = 83333333e18;                   //  83,333,333 e18
+    uint constant public ADVISORS_SHARE = 58333333e18;               //  58,333,333 e18
+    uint constant public COMPANY_SHARE = 127206667e18;               // 127,206,667 e18
+
+    // Remaining token amounts of each pool
     uint public presaleRemaining = PRESALE_CAP;
+    uint public mainsaleRemaining = MAINSALE_CAP;
     uint public bonusRemaining = BONUS_CAP;
 
+    // Beneficiaries of granted token shares
     address public teamWallet;
-    address public companyWallet;
     address public advisorsWallet;
+    address public companyWallet;
 
     ORSToken public token;
 
-    uint public rate;  // integral token units (10^-18 tokens) per wei
+    // Integral token units (10^-18 tokens) per wei
+    uint public rate;
 
+    // Mainsale period
     uint public openingTime;
     uint public closingTime;
 
+    // Ethereum address where invested funds will be transferred to
     address public wallet;
 
+    // Purchases signed via Eidoo's platform will receive bonus tokens
     address public eidooSigner;
 
     bool public isFinalized = false;
@@ -76,15 +85,15 @@ contract ORSTokenSale is KYCBase, ICOEngineInterface, Ownable {
         uint _closingTime,
         address _wallet,
         address _teamWallet,
-        address _companyWallet,
         address _advisorsWallet,
+        address _companyWallet,
         address[] _kycSigners
     )
         public
         KYCBase(_kycSigners)
     {
         require(_token != address(0x0));
-        require(_token.cap() == MAINSALE_CAP + PRESALE_CAP + BONUS_CAP + TEAM_CAP + COMPANY_CAP + ADVISORS_CAP);
+        require(_token.cap() == PRESALE_CAP + MAINSALE_CAP + BONUS_CAP + TEAM_SHARE + ADVISORS_SHARE + COMPANY_SHARE);
         require(_rate > 0);
         require(_openingTime > now && _closingTime > _openingTime);
         require(_wallet != address(0x0));
@@ -97,8 +106,8 @@ contract ORSTokenSale is KYCBase, ICOEngineInterface, Ownable {
         closingTime = _closingTime;
         wallet = _wallet;
         teamWallet = _teamWallet;
-        companyWallet = _companyWallet;
         advisorsWallet = _advisorsWallet;
+        companyWallet = _companyWallet;
 
         eidooSigner = _kycSigners[0];
     }
@@ -121,7 +130,7 @@ contract ORSTokenSale is KYCBase, ICOEngineInterface, Ownable {
     /// @param bonuses A list where each entry is a positive number
     function distributePresale(address[] investors, uint[] tokens, uint[] bonuses) public onlyOwner {
         require(ended() && !isFinalized);
-        require(investors.length == tokens.length && bonuses.length == tokens.length);
+        require(tokens.length == investors.length && bonuses.length == investors.length);
 
         for (uint i = 0; i < investors.length; ++i) {
             presaleRemaining = presaleRemaining.sub(tokens[i]);
@@ -131,16 +140,45 @@ contract ORSTokenSale is KYCBase, ICOEngineInterface, Ownable {
         }
     }
 
+    /// @dev Finalize
+    function finalize() public onlyOwner {
+        require(ended() && !isFinalized);
+        require(presaleRemaining == 0);
+
+        // Distribute granted token shares
+        token.mint(teamWallet, TEAM_SHARE);
+        token.mint(advisorsWallet, ADVISORS_SHARE);
+        token.mint(companyWallet, COMPANY_SHARE);
+
+        // There shouldn't be any remaining presale tokens
+        // Remaining mainsale tokens will be lost (i.e. not minted)
+        // Remaining bonus tokens will be minted for the benefit of company
+        if (bonusRemaining > 0) {
+            token.mint(companyWallet, bonusRemaining);
+            bonusRemaining = 0;
+        }
+
+        // Enable token trade
+        token.finishMinting();
+        token.unpause();
+
+        isFinalized = true;
+
+        emit Finalized();
+    }
+
+    // false if the ico is not started, true if the ico is started and running, true if the ico is completed
     /// @dev Started
     /// @return True or false
     function started() public view returns (bool) {
         return now > openingTime;
     }
 
+    // false if the ico is not started, false if the ico is started and running, true if the ico is completed
     /// @dev Ended
     /// @return True or false
     function ended() public view returns (bool) {
-        return now > closingTime || mainsaleRemaining == 0;
+        return now > closingTime || mainsaleRemaining < rate;
     }
 
     // time stamp of the starting time of the ico, must return 0 if it depends on the block number
@@ -180,28 +218,6 @@ contract ORSTokenSale is KYCBase, ICOEngineInterface, Ownable {
         return rate;
     }
 
-    /// @dev Finalize
-    function finalize() public onlyOwner {
-        require(ended() && !isFinalized);
-        require(presaleRemaining == 0);
-
-        token.mint(teamWallet, TEAM_CAP);
-        token.mint(companyWallet, COMPANY_CAP);
-        token.mint(advisorsWallet, ADVISORS_CAP);
-
-        if (bonusRemaining > 0) {
-            token.mint(companyWallet, bonusRemaining);
-        }
-
-        token.finishMinting();
-        token.unpause();
-        token.transferOwnership(owner);
-
-        isFinalized = true;
-
-        emit Finalized();
-    }
-
     /// @dev Release tokens to
     /// @param buyer An Ethereum address
     /// @param signer An Ethereum address
@@ -215,20 +231,23 @@ contract ORSTokenSale is KYCBase, ICOEngineInterface, Ownable {
         uint tokens = value.mul(rate);
         uint bonus = 0;
 
+        // (Last) buyer whose purchase would exceed available mainsale tokens will be partially refunded
         if (tokens > mainsaleRemaining) {
             uint valueOfRemaining = mainsaleRemaining.div(rate);
 
             refund = value.sub(valueOfRemaining);
-            tokens = mainsaleRemaining;
             value = valueOfRemaining;
+            tokens = mainsaleRemaining;
             // Note:
-            // To be 100% accurate the buyer should have received only the token amount that
-            // correspondents to valueOfRemaining, i.e. tokens = valueOfRemaining.mul(rate)...,
-            // because of mainsaleRemaining may not be a multiple of rate.
-            // Nevertheless, we deliver all mainsaleRemaining as the worth of these additional
-            // tokens (amount < rate) is less than a wei.
+            // To be 100% accurate the buyer should receive only a token amount that corresponds to valueOfRemaining,
+            // i.e. tokens = valueOfRemaining.mul(rate), because of mainsaleRemaining may not be a multiple of rate
+            // (due to regular adaption to the ether/fiat exchange rate).
+            // Nevertheless, we deliver all mainsaleRemaining tokens as the worth of these additional n tokens at time
+            // of purchase is less than a wei and the gas costs of a correct solution, i.e. calculate value * rate
+            // again, would exceed this by several orders of magnitude.
         }
 
+        // Purchases via Eidoo's platform will receive additional 20% bonus tokens
         if (signer == eidooSigner) {
             bonus = tokens.div(20);
         }
@@ -244,7 +263,7 @@ contract ORSTokenSale is KYCBase, ICOEngineInterface, Ownable {
             emit BuyerRefunded(buyer, refund);
         }
 
-        emit TokenPurchased(buyer, value, tokens);
+        emit TokenPurchased(buyer, value, tokens.add(bonus));
 
         return true;
     }
