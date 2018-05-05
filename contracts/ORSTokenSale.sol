@@ -20,8 +20,6 @@ contract ORSTokenSale is KYCBase, ICOEngineInterface, Ownable {
     uint constant public COMPANY_CAP = 127206667e18;    // 127,206,667 e18
     uint constant public ADVISORS_CAP = 58333333e18;    //  58,333,333 e18
 
-    uint public CAP = MAINSALE_CAP + PRESALE_CAP + BONUS_CAP + TEAM_CAP + COMPANY_CAP + ADVISORS_CAP;
-
     uint public mainsaleRemaining = MAINSALE_CAP;
     uint public presaleRemaining = PRESALE_CAP;
     uint public bonusRemaining = BONUS_CAP;
@@ -86,9 +84,7 @@ contract ORSTokenSale is KYCBase, ICOEngineInterface, Ownable {
         KYCBase(_kycSigners)
     {
         require(_token != address(0x0));
-        //require(_token.cap() == MAINSALE_CAP + PRESALE_CAP + BONUS_CAP + TEAM_CAP + COMPANY_CAP + ADVISORS_CAP);
-        //require(uint(_token.cap()) > uint(CAP));
-        require(833333333000000000000000000 == _token.cap());
+        require(_token.cap() == MAINSALE_CAP + PRESALE_CAP + BONUS_CAP + TEAM_CAP + COMPANY_CAP + ADVISORS_CAP);
         require(_rate > 0);
         require(_openingTime > now && _closingTime > _openingTime);
         require(_wallet != address(0x0));
