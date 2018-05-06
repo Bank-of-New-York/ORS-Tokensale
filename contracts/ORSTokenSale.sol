@@ -178,6 +178,13 @@ contract ORSTokenSale is KYCBase, ICOEngineInterface, Ownable {
     /// @dev Ended (as required by Eidoo's ICOEngineInterface)
     /// @return True iff mainsale is finished
     function ended() public view returns (bool) {
+        // Note 1: Even though we allow token holders to burn their tokens immediately after purchase, this won't
+        //         affect the early end via "sold out" as mainsaleRemaining is independent of token.totalSupply.
+        // Note 2: Assuming the rate is adjusted regularly so that a particular tokens per fiat currency rate is
+        //         achieved, mainsaleRemaining may not be a multiple of rate. If token purchase is done via some
+        //         frontend which will allow the last buyer to pay for these remaining tokens but not more, then
+        //         mainsaleRemaining won't decrease to zero ever. There will remain some tokens whose worth is less
+        //         than the minimal payment of 1 wei, thus unbuyable.
         return now > closingTime || mainsaleRemaining < rate;
     }
 
