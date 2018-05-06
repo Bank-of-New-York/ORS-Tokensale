@@ -60,7 +60,7 @@
 
 
 \title{ORS Token Sale}
-\date{May 04, 2018}
+\date{May 06, 2018}
 \release{1}
 \author{SICOS}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -109,8 +109,8 @@
 \PYG{k+kr}{pragma} \PYG{n+nx}{solidity} \PYG{l+m+mf}{0.4}\PYG{l+m+mf}{.23}\PYG{p}{;}
 
 \PYG{k+kr}{import} \PYG{l+s+s2}{\PYGZdq{}./ORSToken.sol\PYGZdq{}}\PYG{p}{;}
+\PYG{k+kr}{import} \PYG{l+s+s2}{\PYGZdq{}./KYCBase.sol\PYGZdq{}}\PYG{p}{;}
 \PYG{k+kr}{import} \PYG{l+s+s2}{\PYGZdq{}../eidoo\PYGZhy{}icoengine/contracts/ICOEngineInterface.sol\PYGZdq{}}\PYG{p}{;}
-\PYG{k+kr}{import} \PYG{l+s+s2}{\PYGZdq{}../eidoo\PYGZhy{}icoengine/contracts/KYCBase.sol\PYGZdq{}}\PYG{p}{;}
 \PYG{k+kr}{import} \PYG{l+s+s2}{\PYGZdq{}../zeppelin\PYGZhy{}solidity/contracts/math/SafeMath.sol\PYGZdq{}}\PYG{p}{;}
 \PYG{k+kr}{import} \PYG{l+s+s2}{\PYGZdq{}../zeppelin\PYGZhy{}solidity/contracts/ownership/Ownable.sol\PYGZdq{}}\PYG{p}{;}
 
@@ -121,30 +121,39 @@
 
     \PYG{k+kr}{using} \PYG{n+nx}{SafeMath} \PYG{k}{for} \PYG{k+kt}{uint}\PYG{p}{;}
 
-    \PYG{k+kt}{uint} \PYG{k+kr}{constant} \PYG{k+kr}{public} \PYG{n+nx}{MAINSALE\PYGZus{}CAP} \PYG{o}{=} \PYG{l+m+mf}{500000000e18}\PYG{p}{;}   \PYG{c+c1}{// 500,000,000 e18}
-    \PYG{k+kt}{uint} \PYG{k+kr}{constant} \PYG{k+kr}{public} \PYG{n+nx}{PRESALE\PYGZus{}CAP} \PYG{o}{=} \PYG{l+m+mi}{0}\PYG{p}{;}               \PYG{c+c1}{// TBD!}
-    \PYG{k+kt}{uint} \PYG{k+kr}{constant} \PYG{k+kr}{public} \PYG{n+nx}{BONUS\PYGZus{}CAP} \PYG{o}{=} \PYG{l+m+mf}{64460000e18}\PYG{p}{;}       \PYG{c+c1}{//  64,460,000 e18}
-    \PYG{k+kt}{uint} \PYG{k+kr}{constant} \PYG{k+kr}{public} \PYG{n+nx}{TEAM\PYGZus{}CAP} \PYG{o}{=} \PYG{l+m+mf}{83333333e18}\PYG{p}{;}        \PYG{c+c1}{//  83,333,333 e18}
-    \PYG{k+kt}{uint} \PYG{k+kr}{constant} \PYG{k+kr}{public} \PYG{n+nx}{COMPANY\PYGZus{}CAP} \PYG{o}{=} \PYG{l+m+mf}{127206667e18}\PYG{p}{;}    \PYG{c+c1}{// 127,206,667 e18}
-    \PYG{k+kt}{uint} \PYG{k+kr}{constant} \PYG{k+kr}{public} \PYG{n+nx}{ADVISORS\PYGZus{}CAP} \PYG{o}{=} \PYG{l+m+mf}{58333333e18}\PYG{p}{;}    \PYG{c+c1}{//  58,333,333 e18}
+    \PYG{c+c1}{// Maximum token amounts of each pool}
+    \PYG{k+kt}{uint} \PYG{k+kr}{constant} \PYG{k+kr}{public} \PYG{n+nx}{PRESALE\PYGZus{}CAP} \PYG{o}{=} \PYG{l+m+mf}{250000000e18}\PYG{p}{;}                 \PYG{c+c1}{// 250,000,000 e18}
+    \PYG{k+kt}{uint} \PYG{k+kr}{constant} \PYG{k+kr}{public} \PYG{n+nx}{MAINSALE\PYGZus{}CAP} \PYG{o}{=} \PYG{l+m+mf}{500000000e18} \PYG{o}{\PYGZhy{}} \PYG{n+nx}{PRESALE\PYGZus{}CAP}\PYG{p}{;}  \PYG{c+c1}{// 250,000,000 e18}
+    \PYG{k+kt}{uint} \PYG{k+kr}{constant} \PYG{k+kr}{public} \PYG{n+nx}{BONUS\PYGZus{}CAP} \PYG{o}{=} \PYG{l+m+mf}{64460000e18}\PYG{p}{;}                    \PYG{c+c1}{//  64,460,000 e18}
 
-    \PYG{k+kt}{uint} \PYG{k+kr}{public} \PYG{n+nx}{mainsaleRemaining} \PYG{o}{=} \PYG{n+nx}{MAINSALE\PYGZus{}CAP}\PYG{p}{;}
+    \PYG{c+c1}{// Granted token shares that will be minted upon finalization}
+    \PYG{k+kt}{uint} \PYG{k+kr}{constant} \PYG{k+kr}{public} \PYG{n+nx}{TEAM\PYGZus{}SHARE} \PYG{o}{=} \PYG{l+m+mf}{83333333e18}\PYG{p}{;}                   \PYG{c+c1}{//  83,333,333 e18}
+    \PYG{k+kt}{uint} \PYG{k+kr}{constant} \PYG{k+kr}{public} \PYG{n+nx}{ADVISORS\PYGZus{}SHARE} \PYG{o}{=} \PYG{l+m+mf}{58333333e18}\PYG{p}{;}               \PYG{c+c1}{//  58,333,333 e18}
+    \PYG{k+kt}{uint} \PYG{k+kr}{constant} \PYG{k+kr}{public} \PYG{n+nx}{COMPANY\PYGZus{}SHARE} \PYG{o}{=} \PYG{l+m+mf}{127206667e18}\PYG{p}{;}               \PYG{c+c1}{// 127,206,667 e18}
+
+    \PYG{c+c1}{// Remaining token amounts of each pool}
     \PYG{k+kt}{uint} \PYG{k+kr}{public} \PYG{n+nx}{presaleRemaining} \PYG{o}{=} \PYG{n+nx}{PRESALE\PYGZus{}CAP}\PYG{p}{;}
+    \PYG{k+kt}{uint} \PYG{k+kr}{public} \PYG{n+nx}{mainsaleRemaining} \PYG{o}{=} \PYG{n+nx}{MAINSALE\PYGZus{}CAP}\PYG{p}{;}
     \PYG{k+kt}{uint} \PYG{k+kr}{public} \PYG{n+nx}{bonusRemaining} \PYG{o}{=} \PYG{n+nx}{BONUS\PYGZus{}CAP}\PYG{p}{;}
 
+    \PYG{c+c1}{// Beneficiaries of granted token shares}
     \PYG{k+kt}{address} \PYG{k+kr}{public} \PYG{n+nx}{teamWallet}\PYG{p}{;}
-    \PYG{k+kt}{address} \PYG{k+kr}{public} \PYG{n+nx}{companyWallet}\PYG{p}{;}
     \PYG{k+kt}{address} \PYG{k+kr}{public} \PYG{n+nx}{advisorsWallet}\PYG{p}{;}
+    \PYG{k+kt}{address} \PYG{k+kr}{public} \PYG{n+nx}{companyWallet}\PYG{p}{;}
 
     \PYG{n+nx}{ORSToken} \PYG{k+kr}{public} \PYG{n+nx}{token}\PYG{p}{;}
 
-    \PYG{k+kt}{uint} \PYG{k+kr}{public} \PYG{n+nx}{rate}\PYG{p}{;}  \PYG{c+c1}{// integral token units (10\PYGZca{}\PYGZhy{}18 tokens) per wei}
+    \PYG{c+c1}{// Integral token units (10\PYGZca{}\PYGZhy{}18 tokens) per wei}
+    \PYG{k+kt}{uint} \PYG{k+kr}{public} \PYG{n+nx}{rate}\PYG{p}{;}
 
+    \PYG{c+c1}{// Mainsale period}
     \PYG{k+kt}{uint} \PYG{k+kr}{public} \PYG{n+nx}{openingTime}\PYG{p}{;}
     \PYG{k+kt}{uint} \PYG{k+kr}{public} \PYG{n+nx}{closingTime}\PYG{p}{;}
 
+    \PYG{c+c1}{// Ethereum address where invested funds will be transferred to}
     \PYG{k+kt}{address} \PYG{k+kr}{public} \PYG{n+nx}{wallet}\PYG{p}{;}
 
+    \PYG{c+c1}{// Purchases signed via Eidoo\PYGZsq{}s platform will receive bonus tokens}
     \PYG{k+kt}{address} \PYG{k+kr}{public} \PYG{n+nx}{eidooSigner}\PYG{p}{;}
 
     \PYG{k+kt}{bool} \PYG{k+kr}{public} \PYG{n+nx}{isFinalized} \PYG{o}{=} \PYG{k+kc}{false}\PYG{p}{;}
@@ -184,15 +193,15 @@
         \PYG{k+kt}{uint} \PYG{n+nx}{\PYGZus{}closingTime}\PYG{p}{,}
         \PYG{k+kt}{address} \PYG{n+nx}{\PYGZus{}wallet}\PYG{p}{,}
         \PYG{k+kt}{address} \PYG{n+nx}{\PYGZus{}teamWallet}\PYG{p}{,}
-        \PYG{k+kt}{address} \PYG{n+nx}{\PYGZus{}companyWallet}\PYG{p}{,}
         \PYG{k+kt}{address} \PYG{n+nx}{\PYGZus{}advisorsWallet}\PYG{p}{,}
+        \PYG{k+kt}{address} \PYG{n+nx}{\PYGZus{}companyWallet}\PYG{p}{,}
         \PYG{k+kt}{address}\PYG{p}{[}\PYG{p}{]} \PYG{n+nx}{\PYGZus{}kycSigners}
     \PYG{p}{)}
         \PYG{k+kr}{public}
         \PYG{n+nx}{KYCBase}\PYG{p}{(}\PYG{n+nx}{\PYGZus{}kycSigners}\PYG{p}{)}
     \PYG{p}{\PYGZob{}}
         \PYG{n+nb}{require}\PYG{p}{(}\PYG{n+nx}{\PYGZus{}token} \PYG{o}{!=} \PYG{k+kt}{address}\PYG{p}{(}\PYG{l+m+mh}{0x0}\PYG{p}{)}\PYG{p}{)}\PYG{p}{;}
-        \PYG{n+nb}{require}\PYG{p}{(}\PYG{n+nx}{\PYGZus{}token}\PYG{p}{.}\PYG{n+nx}{cap}\PYG{p}{(}\PYG{p}{)} \PYG{o}{==} \PYG{n+nx}{MAINSALE\PYGZus{}CAP} \PYG{o}{+} \PYG{n+nx}{PRESALE\PYGZus{}CAP} \PYG{o}{+} \PYG{n+nx}{BONUS\PYGZus{}CAP} \PYG{o}{+} \PYG{n+nx}{TEAM\PYGZus{}CAP} \PYG{o}{+} \PYG{n+nx}{COMPANY\PYGZus{}CAP} \PYG{o}{+} \PYG{n+nx}{ADVISORS\PYGZus{}CAP}\PYG{p}{)}\PYG{p}{;}
+        \PYG{n+nb}{require}\PYG{p}{(}\PYG{n+nx}{\PYGZus{}token}\PYG{p}{.}\PYG{n+nx}{cap}\PYG{p}{(}\PYG{p}{)} \PYG{o}{==} \PYG{n+nx}{PRESALE\PYGZus{}CAP} \PYG{o}{+} \PYG{n+nx}{MAINSALE\PYGZus{}CAP} \PYG{o}{+} \PYG{n+nx}{BONUS\PYGZus{}CAP} \PYG{o}{+} \PYG{n+nx}{TEAM\PYGZus{}SHARE} \PYG{o}{+} \PYG{n+nx}{ADVISORS\PYGZus{}SHARE} \PYG{o}{+} \PYG{n+nx}{COMPANY\PYGZus{}SHARE}\PYG{p}{)}\PYG{p}{;}
         \PYG{n+nb}{require}\PYG{p}{(}\PYG{n+nx}{\PYGZus{}rate} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{0}\PYG{p}{)}\PYG{p}{;}
         \PYG{n+nb}{require}\PYG{p}{(}\PYG{n+nx}{\PYGZus{}openingTime} \PYG{o}{\PYGZgt{}} \PYG{k+kp}{now} \PYG{o}{\PYGZam{}\PYGZam{}} \PYG{n+nx}{\PYGZus{}closingTime} \PYG{o}{\PYGZgt{}} \PYG{n+nx}{\PYGZus{}openingTime}\PYG{p}{)}\PYG{p}{;}
         \PYG{n+nb}{require}\PYG{p}{(}\PYG{n+nx}{\PYGZus{}wallet} \PYG{o}{!=} \PYG{k+kt}{address}\PYG{p}{(}\PYG{l+m+mh}{0x0}\PYG{p}{)}\PYG{p}{)}\PYG{p}{;}
@@ -205,8 +214,8 @@
         \PYG{n+nx}{closingTime} \PYG{o}{=} \PYG{n+nx}{\PYGZus{}closingTime}\PYG{p}{;}
         \PYG{n+nx}{wallet} \PYG{o}{=} \PYG{n+nx}{\PYGZus{}wallet}\PYG{p}{;}
         \PYG{n+nx}{teamWallet} \PYG{o}{=} \PYG{n+nx}{\PYGZus{}teamWallet}\PYG{p}{;}
-        \PYG{n+nx}{companyWallet} \PYG{o}{=} \PYG{n+nx}{\PYGZus{}companyWallet}\PYG{p}{;}
         \PYG{n+nx}{advisorsWallet} \PYG{o}{=} \PYG{n+nx}{\PYGZus{}advisorsWallet}\PYG{p}{;}
+        \PYG{n+nx}{companyWallet} \PYG{o}{=} \PYG{n+nx}{\PYGZus{}companyWallet}\PYG{p}{;}
 
         \PYG{n+nx}{eidooSigner} \PYG{o}{=} \PYG{n+nx}{\PYGZus{}kycSigners}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{p}{;}
     \PYG{p}{\PYGZcb{}}
@@ -229,7 +238,7 @@
     \PYG{c+c1}{/// @param bonuses A list where each entry is a positive number}
     \PYG{k+kd}{function} \PYG{n+nx}{distributePresale}\PYG{p}{(}\PYG{k+kt}{address}\PYG{p}{[}\PYG{p}{]} \PYG{n+nx}{investors}\PYG{p}{,} \PYG{k+kt}{uint}\PYG{p}{[}\PYG{p}{]} \PYG{n+nx}{tokens}\PYG{p}{,} \PYG{k+kt}{uint}\PYG{p}{[}\PYG{p}{]} \PYG{n+nx}{bonuses}\PYG{p}{)} \PYG{k+kr}{public} \PYG{n+nx}{onlyOwner} \PYG{p}{\PYGZob{}}
         \PYG{n+nb}{require}\PYG{p}{(}\PYG{n+nx}{ended}\PYG{p}{(}\PYG{p}{)} \PYG{o}{\PYGZam{}\PYGZam{}} \PYG{o}{!}\PYG{n+nx}{isFinalized}\PYG{p}{)}\PYG{p}{;}
-        \PYG{n+nb}{require}\PYG{p}{(}\PYG{n+nx}{investors}\PYG{p}{.}\PYG{n+nx}{length} \PYG{o}{==} \PYG{n+nx}{tokens}\PYG{p}{.}\PYG{n+nx}{length} \PYG{o}{\PYGZam{}\PYGZam{}} \PYG{n+nx}{bonuses}\PYG{p}{.}\PYG{n+nx}{length} \PYG{o}{==} \PYG{n+nx}{tokens}\PYG{p}{.}\PYG{n+nx}{length}\PYG{p}{)}\PYG{p}{;}
+        \PYG{n+nb}{require}\PYG{p}{(}\PYG{n+nx}{tokens}\PYG{p}{.}\PYG{n+nx}{length} \PYG{o}{==} \PYG{n+nx}{investors}\PYG{p}{.}\PYG{n+nx}{length} \PYG{o}{\PYGZam{}\PYGZam{}} \PYG{n+nx}{bonuses}\PYG{p}{.}\PYG{n+nx}{length} \PYG{o}{==} \PYG{n+nx}{investors}\PYG{p}{.}\PYG{n+nx}{length}\PYG{p}{)}\PYG{p}{;}
 
         \PYG{k}{for} \PYG{p}{(}\PYG{k+kt}{uint} \PYG{n+nx}{i} \PYG{o}{=} \PYG{l+m+mi}{0}\PYG{p}{;} \PYG{n+nx}{i} \PYG{o}{\PYGZlt{}} \PYG{n+nx}{investors}\PYG{p}{.}\PYG{n+nx}{length}\PYG{p}{;} \PYG{o}{++}\PYG{n+nx}{i}\PYG{p}{)} \PYG{p}{\PYGZob{}}
             \PYG{n+nx}{presaleRemaining} \PYG{o}{=} \PYG{n+nx}{presaleRemaining}\PYG{p}{.}\PYG{n+nx}{sub}\PYG{p}{(}\PYG{n+nx}{tokens}\PYG{p}{[}\PYG{n+nx}{i}\PYG{p}{]}\PYG{p}{)}\PYG{p}{;}
@@ -239,16 +248,45 @@
         \PYG{p}{\PYGZcb{}}
     \PYG{p}{\PYGZcb{}}
 
+    \PYG{c+c1}{/// @dev Finalize}
+    \PYG{k+kd}{function} \PYG{n+nx}{finalize}\PYG{p}{(}\PYG{p}{)} \PYG{k+kr}{public} \PYG{n+nx}{onlyOwner} \PYG{p}{\PYGZob{}}
+        \PYG{n+nb}{require}\PYG{p}{(}\PYG{n+nx}{ended}\PYG{p}{(}\PYG{p}{)} \PYG{o}{\PYGZam{}\PYGZam{}} \PYG{o}{!}\PYG{n+nx}{isFinalized}\PYG{p}{)}\PYG{p}{;}
+        \PYG{n+nb}{require}\PYG{p}{(}\PYG{n+nx}{presaleRemaining} \PYG{o}{==} \PYG{l+m+mi}{0}\PYG{p}{)}\PYG{p}{;}
+
+        \PYG{c+c1}{// Distribute granted token shares}
+        \PYG{n+nx}{token}\PYG{p}{.}\PYG{n+nx}{mint}\PYG{p}{(}\PYG{n+nx}{teamWallet}\PYG{p}{,} \PYG{n+nx}{TEAM\PYGZus{}SHARE}\PYG{p}{)}\PYG{p}{;}
+        \PYG{n+nx}{token}\PYG{p}{.}\PYG{n+nx}{mint}\PYG{p}{(}\PYG{n+nx}{advisorsWallet}\PYG{p}{,} \PYG{n+nx}{ADVISORS\PYGZus{}SHARE}\PYG{p}{)}\PYG{p}{;}
+        \PYG{n+nx}{token}\PYG{p}{.}\PYG{n+nx}{mint}\PYG{p}{(}\PYG{n+nx}{companyWallet}\PYG{p}{,} \PYG{n+nx}{COMPANY\PYGZus{}SHARE}\PYG{p}{)}\PYG{p}{;}
+
+        \PYG{c+c1}{// There shouldn\PYGZsq{}t be any remaining presale tokens}
+        \PYG{c+c1}{// Remaining mainsale tokens will be lost (i.e. not minted)}
+        \PYG{c+c1}{// Remaining bonus tokens will be minted for the benefit of company}
+        \PYG{k}{if} \PYG{p}{(}\PYG{n+nx}{bonusRemaining} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{0}\PYG{p}{)} \PYG{p}{\PYGZob{}}
+            \PYG{n+nx}{token}\PYG{p}{.}\PYG{n+nx}{mint}\PYG{p}{(}\PYG{n+nx}{companyWallet}\PYG{p}{,} \PYG{n+nx}{bonusRemaining}\PYG{p}{)}\PYG{p}{;}
+            \PYG{n+nx}{bonusRemaining} \PYG{o}{=} \PYG{l+m+mi}{0}\PYG{p}{;}
+        \PYG{p}{\PYGZcb{}}
+
+        \PYG{c+c1}{// Enable token trade}
+        \PYG{n+nx}{token}\PYG{p}{.}\PYG{n+nx}{finishMinting}\PYG{p}{(}\PYG{p}{)}\PYG{p}{;}
+        \PYG{n+nx}{token}\PYG{p}{.}\PYG{n+nx}{unpause}\PYG{p}{(}\PYG{p}{)}\PYG{p}{;}
+
+        \PYG{n+nx}{isFinalized} \PYG{o}{=} \PYG{k+kc}{true}\PYG{p}{;}
+
+        \PYG{k+kr}{emit} \PYG{n+nx}{Finalized}\PYG{p}{(}\PYG{p}{)}\PYG{p}{;}
+    \PYG{p}{\PYGZcb{}}
+
+    \PYG{c+c1}{// false if the ico is not started, true if the ico is started and running, true if the ico is completed}
     \PYG{c+c1}{/// @dev Started}
     \PYG{c+c1}{/// @return True or false}
     \PYG{k+kd}{function} \PYG{n+nx}{started}\PYG{p}{(}\PYG{p}{)} \PYG{k+kr}{public} \PYG{k+kr}{view} \PYG{k+kr}{returns} \PYG{p}{(}\PYG{k+kt}{bool}\PYG{p}{)} \PYG{p}{\PYGZob{}}
         \PYG{k}{return} \PYG{k+kp}{now} \PYG{o}{\PYGZgt{}} \PYG{n+nx}{openingTime}\PYG{p}{;}
     \PYG{p}{\PYGZcb{}}
 
+    \PYG{c+c1}{// false if the ico is not started, false if the ico is started and running, true if the ico is completed}
     \PYG{c+c1}{/// @dev Ended}
     \PYG{c+c1}{/// @return True or false}
     \PYG{k+kd}{function} \PYG{n+nx}{ended}\PYG{p}{(}\PYG{p}{)} \PYG{k+kr}{public} \PYG{k+kr}{view} \PYG{k+kr}{returns} \PYG{p}{(}\PYG{k+kt}{bool}\PYG{p}{)} \PYG{p}{\PYGZob{}}
-        \PYG{k}{return} \PYG{k+kp}{now} \PYG{o}{\PYGZgt{}} \PYG{n+nx}{closingTime} \PYG{o}{\textbar{}\textbar{}} \PYG{n+nx}{mainsaleRemaining} \PYG{o}{==} \PYG{l+m+mi}{0}\PYG{p}{;}
+        \PYG{k}{return} \PYG{k+kp}{now} \PYG{o}{\PYGZgt{}} \PYG{n+nx}{closingTime} \PYG{o}{\textbar{}\textbar{}} \PYG{n+nx}{mainsaleRemaining} \PYG{o}{\PYGZlt{}} \PYG{n+nx}{rate}\PYG{p}{;}
     \PYG{p}{\PYGZcb{}}
 
     \PYG{c+c1}{// time stamp of the starting time of the ico, must return 0 if it depends on the block number}
@@ -288,28 +326,6 @@
         \PYG{k}{return} \PYG{n+nx}{rate}\PYG{p}{;}
     \PYG{p}{\PYGZcb{}}
 
-    \PYG{c+c1}{/// @dev Finalize}
-    \PYG{k+kd}{function} \PYG{n+nx}{finalize}\PYG{p}{(}\PYG{p}{)} \PYG{k+kr}{public} \PYG{n+nx}{onlyOwner} \PYG{p}{\PYGZob{}}
-        \PYG{n+nb}{require}\PYG{p}{(}\PYG{n+nx}{ended}\PYG{p}{(}\PYG{p}{)} \PYG{o}{\PYGZam{}\PYGZam{}} \PYG{o}{!}\PYG{n+nx}{isFinalized}\PYG{p}{)}\PYG{p}{;}
-        \PYG{n+nb}{require}\PYG{p}{(}\PYG{n+nx}{presaleRemaining} \PYG{o}{==} \PYG{l+m+mi}{0}\PYG{p}{)}\PYG{p}{;}
-
-        \PYG{n+nx}{token}\PYG{p}{.}\PYG{n+nx}{mint}\PYG{p}{(}\PYG{n+nx}{teamWallet}\PYG{p}{,} \PYG{n+nx}{TEAM\PYGZus{}CAP}\PYG{p}{)}\PYG{p}{;}
-        \PYG{n+nx}{token}\PYG{p}{.}\PYG{n+nx}{mint}\PYG{p}{(}\PYG{n+nx}{companyWallet}\PYG{p}{,} \PYG{n+nx}{COMPANY\PYGZus{}CAP}\PYG{p}{)}\PYG{p}{;}
-        \PYG{n+nx}{token}\PYG{p}{.}\PYG{n+nx}{mint}\PYG{p}{(}\PYG{n+nx}{advisorsWallet}\PYG{p}{,} \PYG{n+nx}{ADVISORS\PYGZus{}CAP}\PYG{p}{)}\PYG{p}{;}
-
-        \PYG{k}{if} \PYG{p}{(}\PYG{n+nx}{bonusRemaining} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{0}\PYG{p}{)} \PYG{p}{\PYGZob{}}
-            \PYG{n+nx}{token}\PYG{p}{.}\PYG{n+nx}{mint}\PYG{p}{(}\PYG{n+nx}{companyWallet}\PYG{p}{,} \PYG{n+nx}{bonusRemaining}\PYG{p}{)}\PYG{p}{;}
-        \PYG{p}{\PYGZcb{}}
-
-        \PYG{n+nx}{token}\PYG{p}{.}\PYG{n+nx}{finishMinting}\PYG{p}{(}\PYG{p}{)}\PYG{p}{;}
-        \PYG{n+nx}{token}\PYG{p}{.}\PYG{n+nx}{unpause}\PYG{p}{(}\PYG{p}{)}\PYG{p}{;}
-        \PYG{n+nx}{token}\PYG{p}{.}\PYG{n+nx}{transferOwnership}\PYG{p}{(}\PYG{n+nx}{owner}\PYG{p}{)}\PYG{p}{;}
-
-        \PYG{n+nx}{isFinalized} \PYG{o}{=} \PYG{k+kc}{true}\PYG{p}{;}
-
-        \PYG{k+kr}{emit} \PYG{n+nx}{Finalized}\PYG{p}{(}\PYG{p}{)}\PYG{p}{;}
-    \PYG{p}{\PYGZcb{}}
-
     \PYG{c+c1}{/// @dev Release tokens to}
     \PYG{c+c1}{/// @param buyer An Ethereum address}
     \PYG{c+c1}{/// @param signer An Ethereum address}
@@ -323,20 +339,23 @@
         \PYG{k+kt}{uint} \PYG{n+nx}{tokens} \PYG{o}{=} \PYG{n+nx}{value}\PYG{p}{.}\PYG{n+nx}{mul}\PYG{p}{(}\PYG{n+nx}{rate}\PYG{p}{)}\PYG{p}{;}
         \PYG{k+kt}{uint} \PYG{n+nx}{bonus} \PYG{o}{=} \PYG{l+m+mi}{0}\PYG{p}{;}
 
+        \PYG{c+c1}{// (Last) buyer whose purchase would exceed available mainsale tokens will be partially refunded}
         \PYG{k}{if} \PYG{p}{(}\PYG{n+nx}{tokens} \PYG{o}{\PYGZgt{}} \PYG{n+nx}{mainsaleRemaining}\PYG{p}{)} \PYG{p}{\PYGZob{}}
             \PYG{k+kt}{uint} \PYG{n+nx}{valueOfRemaining} \PYG{o}{=} \PYG{n+nx}{mainsaleRemaining}\PYG{p}{.}\PYG{n+nx}{div}\PYG{p}{(}\PYG{n+nx}{rate}\PYG{p}{)}\PYG{p}{;}
 
             \PYG{n+nx}{refund} \PYG{o}{=} \PYG{n+nx}{value}\PYG{p}{.}\PYG{n+nx}{sub}\PYG{p}{(}\PYG{n+nx}{valueOfRemaining}\PYG{p}{)}\PYG{p}{;}
-            \PYG{n+nx}{tokens} \PYG{o}{=} \PYG{n+nx}{mainsaleRemaining}\PYG{p}{;}
             \PYG{n+nx}{value} \PYG{o}{=} \PYG{n+nx}{valueOfRemaining}\PYG{p}{;}
+            \PYG{n+nx}{tokens} \PYG{o}{=} \PYG{n+nx}{mainsaleRemaining}\PYG{p}{;}
             \PYG{c+c1}{// Note:}
-            \PYG{c+c1}{// To be 100\PYGZpc{} accurate the buyer should have received only the token amount that}
-            \PYG{c+c1}{// correspondents to valueOfRemaining, i.e. tokens = valueOfRemaining.mul(rate)...,}
-            \PYG{c+c1}{// because of mainsaleRemaining may not be a multiple of rate.}
-            \PYG{c+c1}{// Nevertheless, we deliver all mainsaleRemaining as the worth of these additional}
-            \PYG{c+c1}{// tokens (amount \PYGZlt{} rate) is less than a wei.}
+            \PYG{c+c1}{// To be 100\PYGZpc{} accurate the buyer should receive only a token amount that corresponds to valueOfRemaining,}
+            \PYG{c+c1}{// i.e. tokens = valueOfRemaining.mul(rate), because of mainsaleRemaining may not be a multiple of rate}
+            \PYG{c+c1}{// (due to regular adaption to the ether/fiat exchange rate).}
+            \PYG{c+c1}{// Nevertheless, we deliver all mainsaleRemaining tokens as the worth of these additional n tokens at time}
+            \PYG{c+c1}{// of purchase is less than a wei and the gas costs of a correct solution, i.e. calculate value * rate}
+            \PYG{c+c1}{// again, would exceed this by several orders of magnitude.}
         \PYG{p}{\PYGZcb{}}
 
+        \PYG{c+c1}{// Purchases via Eidoo\PYGZsq{}s platform will receive additional 20\PYGZpc{} bonus tokens}
         \PYG{k}{if} \PYG{p}{(}\PYG{n+nx}{signer} \PYG{o}{==} \PYG{n+nx}{eidooSigner}\PYG{p}{)} \PYG{p}{\PYGZob{}}
             \PYG{n+nx}{bonus} \PYG{o}{=} \PYG{n+nx}{tokens}\PYG{p}{.}\PYG{n+nx}{div}\PYG{p}{(}\PYG{l+m+mi}{20}\PYG{p}{)}\PYG{p}{;}
         \PYG{p}{\PYGZcb{}}
@@ -352,7 +371,7 @@
             \PYG{k+kr}{emit} \PYG{n+nx}{BuyerRefunded}\PYG{p}{(}\PYG{n+nx}{buyer}\PYG{p}{,} \PYG{n+nx}{refund}\PYG{p}{)}\PYG{p}{;}
         \PYG{p}{\PYGZcb{}}
 
-        \PYG{k+kr}{emit} \PYG{n+nx}{TokenPurchased}\PYG{p}{(}\PYG{n+nx}{buyer}\PYG{p}{,} \PYG{n+nx}{value}\PYG{p}{,} \PYG{n+nx}{tokens}\PYG{p}{)}\PYG{p}{;}
+        \PYG{k+kr}{emit} \PYG{n+nx}{TokenPurchased}\PYG{p}{(}\PYG{n+nx}{buyer}\PYG{p}{,} \PYG{n+nx}{value}\PYG{p}{,} \PYG{n+nx}{tokens}\PYG{p}{.}\PYG{n+nx}{add}\PYG{p}{(}\PYG{n+nx}{bonus}\PYG{p}{)}\PYG{p}{)}\PYG{p}{;}
 
         \PYG{k}{return} \PYG{k+kc}{true}\PYG{p}{;}
     \PYG{p}{\PYGZcb{}}

@@ -1,0 +1,4 @@
+[submodule "eidoo-icoengine"]
+	path = eidoo-icoengine
+	url = https://github.com/eidoo/icoengine.git
+	branch = ors-integration
