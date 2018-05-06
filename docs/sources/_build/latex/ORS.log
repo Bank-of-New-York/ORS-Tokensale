@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (Web2C 2015) (preloaded format=pdflatex 2017.12.30)  6 MAY 2018 02:17
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (Web2C 2015) (preloaded format=pdflatex 2017.12.30)  6 MAY 2018 16:00
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1096,7 +1096,7 @@ Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 386.
 Here is how much of TeX's memory you used:
  13341 strings out of 493093
  184120 string characters out of 6138119
- 617637 words of memory out of 5000000
+ 635276 words of memory out of 5000000
  16535 multiletter control sequences out of 15000+600000
  37210 words of font info for 54 fonts, out of 8000000 for 9000
  1142 hyphenation exceptions out of 8191
@@ -1109,7 +1109,7 @@ public/inconsolata/Inconsolata-zi4r.pfb></usr/local/share/texmf-dist/fonts/type
 amsfonts/cm/cmsy5.pfb></usr/local/share/texmf-dist/fonts/type1/urw/helvetic/uhv
 b8a.pfb></usr/local/share/texmf-dist/fonts/type1/urw/helvetic/uhvbo8a.pfb></usr
 /local/share/texmf-dist/fonts/type1/urw/times/utmr8a.pfb>
-Output written on ORS.pdf (8 pages, 71708 bytes).
+Output written on ORS.pdf (8 pages, 72772 bytes).
 PDF statistics:
  91 PDF objects out of 1000 (max. 8388607)
  69 compressed objects within 1 object stream
