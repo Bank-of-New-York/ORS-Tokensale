@@ -18,6 +18,10 @@ Add toolchain to PATH environment variable:
 
 	source ./set_path.sh
 
+Run linter:
+
+	solium -d contracts
+
 Compile contracts:
 
 	truffle compile --all

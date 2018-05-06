@@ -1,0 +1,10 @@
+--- eidoo-icoengine/contracts/KYCBase.sol	2018-05-06 01:48:34.275499000 +0200
++++ contracts/KYCBase.sol	2018-05-06 02:14:52.067223000 +0200
+@@ -1,6 +1,6 @@
+ pragma solidity ^0.4.19;
+ 
+-import "./SafeMath.sol";
++import "../zeppelin-solidity/contracts/math/SafeMath.sol";
+ 
+ // Abstract base contract
+ contract KYCBase {
