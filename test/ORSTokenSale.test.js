@@ -66,13 +66,14 @@ contract("ORSTokenSale", ([owner,
                            advisorsWallet,
                            companyWallet,
                            anyone]) => {
-    const TOKEN_CAP      = new BN("833 333 333 e18".replace(/\s/g, ""));
-    const PRESALE_CAP    = new BN("250 000 000 e18".replace(/\s/g, ""));
-    const MAINSALE_CAP   = new BN("250 000 000 e18".replace(/\s/g, ""));
-    const BONUS_CAP      = new BN( "64 460 000 e18".replace(/\s/g, ""));
-    const TEAM_SHARE     = new BN( "83 333 333 e18".replace(/\s/g, ""));
-    const ADVISORS_SHARE = new BN( "58 333 333 e18".replace(/\s/g, ""));
-    const COMPANY_SHARE  = new BN("127 206 667 e18".replace(/\s/g, ""));
+    //                               M  k  1
+    const TOKEN_CAP      = new BN("833333333e18");
+    const PRESALE_CAP    = new BN("250000000e18");
+    const MAINSALE_CAP   = new BN("250000000e18");
+    const BONUS_CAP      = new BN( "64460000e18");
+    const TEAM_SHARE     = new BN( "83333333e18");
+    const ADVISORS_SHARE = new BN( "58333333e18");
+    const COMPANY_SHARE  = new BN("127206667e18");
 
     // Helper function: default deployment parameters
     const defaultParams = () => {
