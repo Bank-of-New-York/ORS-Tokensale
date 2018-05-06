@@ -1,7 +1,7 @@
 pragma solidity 0.4.23;
 
 import "./ORSToken.sol";
-import "./CustomKYCBase.sol";
+import "./KYCBase.sol";
 import "../eidoo-icoengine/contracts/ICOEngineInterface.sol";
 import "../zeppelin-solidity/contracts/math/SafeMath.sol";
 import "../zeppelin-solidity/contracts/ownership/Ownable.sol";

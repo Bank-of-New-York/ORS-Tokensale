@@ -1,12 +1,12 @@
 {
-    "name": "ORS-ICO",
+    "name": "ORS-TokenSale",
     "version": "2.0.0",
-    "description": "ORS ICO Solidity Smart Contracts",
-    "author": "SICOS",
-    "license": "UNLICENSED",
+    "description": "ORS Token Sale Solidity Smart Contracts",
+    "author": "Sicos",
+    "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "http://46.101.229.186:3000/sicos/ors-ico"
+        "url": "https://github.com/ORSGroup/ORS-Tokensale.git"
     },
     "dependencies": {
         "chai": "4.1.2",
