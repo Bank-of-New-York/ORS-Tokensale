@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (Web2C 2015) (preloaded format=pdflatex 2017.12.30)  6 MAY 2018 16:04
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (Web2C 2015) (preloaded format=pdflatex 2017.12.30)  7 MAY 2018 15:16
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1057,45 +1057,45 @@ File: ts1zi4.fd 2014/06/22 Fontinst v1.933 font definitions for TS1/zi4.
 ) [2
 
 ]
-Underfull \vbox (badness 10000) detected at line 380
+Underfull \vbox (badness 10000) detected at line 382
  []
 
 
-Overfull \vbox (3.29312pt too high) detected at line 380
+Overfull \vbox (3.29312pt too high) detected at line 382
  []
 
 [3]
-Underfull \vbox (badness 10000) detected at line 380
+Underfull \vbox (badness 10000) detected at line 382
  []
 
 
-Overfull \vbox (3.29312pt too high) detected at line 380
+Overfull \vbox (3.29312pt too high) detected at line 382
  []
 
 [4]
-Underfull \vbox (badness 10000) detected at line 380
+Underfull \vbox (badness 10000) detected at line 382
  []
 
 
-Overfull \vbox (3.29312pt too high) detected at line 380
+Overfull \vbox (14.29312pt too high) detected at line 382
  []
 
 [5]
 No file Sources.ind.
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 386.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 388.
 [6]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 386.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 388.
  (./Sources.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 386.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 386.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 388.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 388.
 Package rerunfilecheck Info: File `Sources.out' has not changed.
 (rerunfilecheck)             Checksum: D8720FBA4409E7495E84705269214C90;186.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 386.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 388.
  ) 
 Here is how much of TeX's memory you used:
  13341 strings out of 493093
  184180 string characters out of 6138119
- 635641 words of memory out of 5000000
+ 641065 words of memory out of 5000000
  16535 multiletter control sequences out of 15000+600000
  37210 words of font info for 54 fonts, out of 8000000 for 9000
  1142 hyphenation exceptions out of 8191
@@ -1108,7 +1108,7 @@ public/inconsolata/Inconsolata-zi4r.pfb></usr/local/share/texmf-dist/fonts/type
 amsfonts/cm/cmsy5.pfb></usr/local/share/texmf-dist/fonts/type1/urw/helvetic/uhv
 b8a.pfb></usr/local/share/texmf-dist/fonts/type1/urw/helvetic/uhvbo8a.pfb></usr
 /local/share/texmf-dist/fonts/type1/urw/times/utmr8a.pfb>
-Output written on Sources.pdf (8 pages, 73492 bytes).
+Output written on Sources.pdf (8 pages, 73761 bytes).
 PDF statistics:
  91 PDF objects out of 1000 (max. 8388607)
  69 compressed objects within 1 object stream
