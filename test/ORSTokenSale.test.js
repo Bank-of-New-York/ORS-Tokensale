@@ -325,8 +325,8 @@ contract("ORSTokenSale", ([owner,
 
         describe("distribute presold tokens", () => {
 
-            it("is forbidden", async () => {
-                await rejectTx(sale.distributePresale([], [], [], {from: owner}));
+            it("is permitted", async () => {
+                await sale.distributePresale([], [], {from: owner});
             });
         });
 
@@ -372,8 +372,8 @@ contract("ORSTokenSale", ([owner,
 
         describe("distribute presold tokens", () => {
 
-            it("is forbidden", async () => {
-                await rejectTx(sale.distributePresale([], [], [], {from: owner}));
+            it("is permitted", async () => {
+                await sale.distributePresale([], [], {from: owner});
             });
         });
 
@@ -566,67 +566,52 @@ contract("ORSTokenSale", ([owner,
         describe("distribute presold tokens", () => {
 
             it("by anyone is forbidden", async () => {
-                await rejectTx(sale.distributePresale([], [], [], {from: anyone}));
+                await rejectTx(sale.distributePresale([], [], {from: anyone}));
             });
 
-            it("is forbidden if number of investors, amounts, bonuses aren't equal", async () => {
-                await rejectTx(sale.distributePresale([investor1], [], [], {from: owner}));
-                await rejectTx(sale.distributePresale([], [1], [], {from: owner}));
-                await rejectTx(sale.distributePresale([], [], [0], {from: owner}));
+            it("is forbidden if number of investors and amounts aren't equal", async () => {
+                await rejectTx(sale.distributePresale([investor1], [], {from: owner}));
+                await rejectTx(sale.distributePresale([], [1], {from: owner}));
             });
 
             it("decreases remaining presale tokens by correct amount", async () => {
                 let investors = [investor1, investor2];
                 let tokens = [new BN("1e18"), new BN("2e18")];
-                let bonuses = [new BN("3e16"), new BN("4e16")];
                 let presaleRemaining = tokens.reduce((remaining, amount) => remaining.minus(amount),
                                                      await sale.presaleRemaining());
-                await sale.distributePresale(investors, tokens, bonuses, {from: owner});
+                await sale.distributePresale(investors, tokens, {from: owner});
                 expect(await sale.presaleRemaining()).to.be.bignumber.equal(presaleRemaining);
-            });
-
-            it("decreases remaining bonus tokens by correct amount", async () => {
-                let investors = [investor1, investor2];
-                let tokens = [new BN("1e18"), new BN("2e18")];
-                let bonuses = [new BN("3e16"), new BN("4e16")];
-                let bonusRemaining = bonuses.reduce((remaining, amount) => remaining.minus(amount),
-                                                    await sale.bonusRemaining());
-                await sale.distributePresale(investors, tokens, bonuses, {from: owner});
-                expect(await sale.bonusRemaining()).to.be.bignumber.equal(bonusRemaining);
             });
 
             it("increases the investors' balances", async () => {
                 let investors = [investor1, investor2];
                 let tokens = [new BN("1e18"), new BN("2e18")];
-                let bonuses = [new BN("3e16"), new BN("4e16")];
                 let balances = [];
                 for (let i = 0; i < investors.length; ++i) {
                     balances.push(await token.balanceOf(investors[i]));
                 }
-                await sale.distributePresale(investors, tokens, bonuses, {from: owner});
+                await sale.distributePresale(investors, tokens, {from: owner});
                 for (let i = 0; i < investors.length; ++i) {
                     expect(await token.balanceOf(investors[i])).to.be.bignumber.equal(
-                        balances[i].plus(tokens[i]).plus(bonuses[i]));
+                        balances[i].plus(tokens[i]));
                 }
             });
 
             it("is possible for many investors at once", async () => {
-                await logGas(sale.distributePresale([], [], [], {from: owner}), "no investors");
+                await logGas(sale.distributePresale([], [], {from: owner}), "no investors");
                 let nSucc = 0;
                 let nFail = -1;
                 let nTest = 1;
                 while (nTest != nSucc) {
                     let investors = [];
                     let tokens = [];
-                    let bonuses = [];
                     for (let i = 0; i < nTest; ++i) {
                         investors.push(randomAddr());
                         tokens.push(i);
-                        bonuses.push(i);
                     }
                     let success = true;
                     try {
-                        await logGas(sale.distributePresale(investors, tokens, bonuses, {from: owner}),
+                        await logGas(sale.distributePresale(investors, tokens, {from: owner}),
                                      nTest + " investors");
                     }
                     catch (error) {
@@ -646,12 +631,7 @@ contract("ORSTokenSale", ([owner,
 
             it("doesn't exceed presale cap", async () => {
                 let presaleRemaining = await sale.presaleRemaining();
-                await rejectTx(sale.distributePresale([investor1], [presaleRemaining.plus(1)], [0], {from: owner}));
-            });
-
-            it("doesn't exceed bonus cap", async () => {
-                let bonusRemaining = await sale.bonusRemaining();
-                await rejectTx(sale.distributePresale([investor1], [0], [bonusRemaining.plus(1)], {from: owner}));
+                await rejectTx(sale.distributePresale([investor1], [presaleRemaining.plus(1)], {from: owner}));
             });
         });
 
@@ -679,7 +659,7 @@ contract("ORSTokenSale", ([owner,
 
             it("is forbidden if there are remaining presale tokens", async () => {
                 await rejectTx(sale.finalize({from: owner}));
-                sale.distributePresale([investor1], [await sale.presaleRemaining()], [0], {from: owner});
+                sale.distributePresale([investor1], [await sale.presaleRemaining()], {from: owner});
             });
 
             it("by anyone is forbidden", async () => {
@@ -744,8 +724,7 @@ contract("ORSTokenSale", ([owner,
             await increaseTime(duration.days(2));
             await sale.setRate((await sale.mainsaleRemaining()).divToInt(currency.ether(1)), {from: owner});
             await buyTokens(sale, eidooSigner, {from: buyer, value: currency.ether(2)});
-            await sale.distributePresale([investor1], [await sale.presaleRemaining()], [await sale.bonusRemaining()],
-                                         {from: owner});
+            await sale.distributePresale([investor1], [await sale.presaleRemaining()], {from: owner});
             await sale.finalize();
             const format = number => (" ".repeat(27) + number.toPrecision()).slice(-27);
             log("cap                  = " + format(await token.cap()));
