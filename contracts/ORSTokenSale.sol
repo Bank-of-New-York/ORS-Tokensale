@@ -14,6 +14,7 @@ contract ORSTokenSale is KYCBase, ICOEngineInterface, Ownable {
     using SafeMath for uint;
 
     // Maximum token amounts of each pool
+    // Note: BONUS_CAP should be at least 5% of MAINSALE_CAP
     uint constant public PRESALE_CAP = 250000000e18;                 // 250,000,000 e18
     uint constant public MAINSALE_CAP = 500000000e18 - PRESALE_CAP;  // 250,000,000 e18
     uint constant public BONUS_CAP = 64460000e18;                    //  64,460,000 e18
@@ -127,16 +128,14 @@ contract ORSTokenSale is KYCBase, ICOEngineInterface, Ownable {
     /// @dev Distribute presold tokens and bonus tokens to investors
     /// @param investors List of investors' Ethereum addresses
     /// @param tokens List of integral token amounts each investors will receive
-    /// @param bonuses List of integral bonus token amounts each investor will receive
-    function distributePresale(address[] investors, uint[] tokens, uint[] bonuses) public onlyOwner {
-        require(ended() && !isFinalized);
-        require(tokens.length == investors.length && bonuses.length == investors.length);
+    function distributePresale(address[] investors, uint[] tokens) public onlyOwner {
+        require(!isFinalized);
+        require(tokens.length == investors.length);
 
         for (uint i = 0; i < investors.length; ++i) {
             presaleRemaining = presaleRemaining.sub(tokens[i]);
-            bonusRemaining = bonusRemaining.sub(bonuses[i]);
 
-            token.mint(investors[i], tokens[i].add(bonuses[i]));
+            token.mint(investors[i], tokens[i]);
         }
     }
 
