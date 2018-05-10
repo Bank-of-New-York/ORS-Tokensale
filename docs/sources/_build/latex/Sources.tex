@@ -60,7 +60,7 @@
 
 
 \title{ORS TokenSale Solidity Smart Contracts}
-\date{May 07, 2018}
+\date{May 10, 2018}
 \release{2}
 \author{Sicos et al.}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -122,6 +122,7 @@
     \PYG{k+kr}{using} \PYG{n+nx}{SafeMath} \PYG{k}{for} \PYG{k+kt}{uint}\PYG{p}{;}
 
     \PYG{c+c1}{// Maximum token amounts of each pool}
+    \PYG{c+c1}{// Note: BONUS\PYGZus{}CAP should be at least 5\PYGZpc{} of MAINSALE\PYGZus{}CAP}
     \PYG{k+kt}{uint} \PYG{k+kr}{constant} \PYG{k+kr}{public} \PYG{n+nx}{PRESALE\PYGZus{}CAP} \PYG{o}{=} \PYG{l+m+mf}{250000000e18}\PYG{p}{;}                 \PYG{c+c1}{// 250,000,000 e18}
     \PYG{k+kt}{uint} \PYG{k+kr}{constant} \PYG{k+kr}{public} \PYG{n+nx}{MAINSALE\PYGZus{}CAP} \PYG{o}{=} \PYG{l+m+mf}{500000000e18} \PYG{o}{\PYGZhy{}} \PYG{n+nx}{PRESALE\PYGZus{}CAP}\PYG{p}{;}  \PYG{c+c1}{// 250,000,000 e18}
     \PYG{k+kt}{uint} \PYG{k+kr}{constant} \PYG{k+kr}{public} \PYG{n+nx}{BONUS\PYGZus{}CAP} \PYG{o}{=} \PYG{l+m+mf}{64460000e18}\PYG{p}{;}                    \PYG{c+c1}{//  64,460,000 e18}
@@ -235,16 +236,14 @@
     \PYG{c+c1}{/// @dev Distribute presold tokens and bonus tokens to investors}
     \PYG{c+c1}{/// @param investors List of investors\PYGZsq{} Ethereum addresses}
     \PYG{c+c1}{/// @param tokens List of integral token amounts each investors will receive}
-    \PYG{c+c1}{/// @param bonuses List of integral bonus token amounts each investor will receive}
-    \PYG{k+kd}{function} \PYG{n+nx}{distributePresale}\PYG{p}{(}\PYG{k+kt}{address}\PYG{p}{[}\PYG{p}{]} \PYG{n+nx}{investors}\PYG{p}{,} \PYG{k+kt}{uint}\PYG{p}{[}\PYG{p}{]} \PYG{n+nx}{tokens}\PYG{p}{,} \PYG{k+kt}{uint}\PYG{p}{[}\PYG{p}{]} \PYG{n+nx}{bonuses}\PYG{p}{)} \PYG{k+kr}{public} \PYG{n+nx}{onlyOwner} \PYG{p}{\PYGZob{}}
-        \PYG{n+nb}{require}\PYG{p}{(}\PYG{n+nx}{ended}\PYG{p}{(}\PYG{p}{)} \PYG{o}{\PYGZam{}\PYGZam{}} \PYG{o}{!}\PYG{n+nx}{isFinalized}\PYG{p}{)}\PYG{p}{;}
-        \PYG{n+nb}{require}\PYG{p}{(}\PYG{n+nx}{tokens}\PYG{p}{.}\PYG{n+nx}{length} \PYG{o}{==} \PYG{n+nx}{investors}\PYG{p}{.}\PYG{n+nx}{length} \PYG{o}{\PYGZam{}\PYGZam{}} \PYG{n+nx}{bonuses}\PYG{p}{.}\PYG{n+nx}{length} \PYG{o}{==} \PYG{n+nx}{investors}\PYG{p}{.}\PYG{n+nx}{length}\PYG{p}{)}\PYG{p}{;}
+    \PYG{k+kd}{function} \PYG{n+nx}{distributePresale}\PYG{p}{(}\PYG{k+kt}{address}\PYG{p}{[}\PYG{p}{]} \PYG{n+nx}{investors}\PYG{p}{,} \PYG{k+kt}{uint}\PYG{p}{[}\PYG{p}{]} \PYG{n+nx}{tokens}\PYG{p}{)} \PYG{k+kr}{public} \PYG{n+nx}{onlyOwner} \PYG{p}{\PYGZob{}}
+        \PYG{n+nb}{require}\PYG{p}{(}\PYG{o}{!}\PYG{n+nx}{isFinalized}\PYG{p}{)}\PYG{p}{;}
+        \PYG{n+nb}{require}\PYG{p}{(}\PYG{n+nx}{tokens}\PYG{p}{.}\PYG{n+nx}{length} \PYG{o}{==} \PYG{n+nx}{investors}\PYG{p}{.}\PYG{n+nx}{length}\PYG{p}{)}\PYG{p}{;}
 
         \PYG{k}{for} \PYG{p}{(}\PYG{k+kt}{uint} \PYG{n+nx}{i} \PYG{o}{=} \PYG{l+m+mi}{0}\PYG{p}{;} \PYG{n+nx}{i} \PYG{o}{\PYGZlt{}} \PYG{n+nx}{investors}\PYG{p}{.}\PYG{n+nx}{length}\PYG{p}{;} \PYG{o}{++}\PYG{n+nx}{i}\PYG{p}{)} \PYG{p}{\PYGZob{}}
             \PYG{n+nx}{presaleRemaining} \PYG{o}{=} \PYG{n+nx}{presaleRemaining}\PYG{p}{.}\PYG{n+nx}{sub}\PYG{p}{(}\PYG{n+nx}{tokens}\PYG{p}{[}\PYG{n+nx}{i}\PYG{p}{]}\PYG{p}{)}\PYG{p}{;}
-            \PYG{n+nx}{bonusRemaining} \PYG{o}{=} \PYG{n+nx}{bonusRemaining}\PYG{p}{.}\PYG{n+nx}{sub}\PYG{p}{(}\PYG{n+nx}{bonuses}\PYG{p}{[}\PYG{n+nx}{i}\PYG{p}{]}\PYG{p}{)}\PYG{p}{;}
 
-            \PYG{n+nx}{token}\PYG{p}{.}\PYG{n+nx}{mint}\PYG{p}{(}\PYG{n+nx}{investors}\PYG{p}{[}\PYG{n+nx}{i}\PYG{p}{]}\PYG{p}{,} \PYG{n+nx}{tokens}\PYG{p}{[}\PYG{n+nx}{i}\PYG{p}{]}\PYG{p}{.}\PYG{n+nx}{add}\PYG{p}{(}\PYG{n+nx}{bonuses}\PYG{p}{[}\PYG{n+nx}{i}\PYG{p}{]}\PYG{p}{)}\PYG{p}{)}\PYG{p}{;}
+            \PYG{n+nx}{token}\PYG{p}{.}\PYG{n+nx}{mint}\PYG{p}{(}\PYG{n+nx}{investors}\PYG{p}{[}\PYG{n+nx}{i}\PYG{p}{]}\PYG{p}{,} \PYG{n+nx}{tokens}\PYG{p}{[}\PYG{n+nx}{i}\PYG{p}{]}\PYG{p}{)}\PYG{p}{;}
         \PYG{p}{\PYGZcb{}}
     \PYG{p}{\PYGZcb{}}
 
