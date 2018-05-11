@@ -734,7 +734,7 @@ contract("ORSTokenSale", ([owner,
             log("balance of investors = " + format(await token.balanceOf(investor1)));
             log("balance of company   = " + format(await token.balanceOf(companyWallet)));
             log("balance of advisors  = " + format(await token.balanceOf(advisorsWallet)));
-            log("balance of bonus     = " + format(await token.balanceOf(bountyWallet)));
+            log("balance of bounty    = " + format(await token.balanceOf(bountyWallet)));
             log("remaining presale    = " + format(await sale.presaleRemaining()));
             log("remaining mainsale   = " + format(await sale.mainsaleRemaining()));
             log("remaining bonus      = " + format(await sale.bonusRemaining()));

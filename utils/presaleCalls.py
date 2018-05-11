@@ -5,20 +5,28 @@ import csv
 FILENAME = "RCSnapshot_04MAY2018.csv"
 CHUNKSIZE = 100
 
+USE_BRACKETS = True
+USE_QUOTES = True
+
+
 def quanta(number):
-    parts = number.split(",")
     decimals = 18
+    parts = number.split(",")
     return int(parts[0] + (parts[1].ljust(decimals, "0") \
                            if len(parts) >= 2 \
                            else "0" * decimals))
 
 def output(index, addresses, amounts):
+    listFormat = "[{}]" if USE_BRACKETS else "{}"
+    itemFormat = "'{}'" if USE_QUOTES else "{}"
     print("_" * 64)
     print("{}...{}".format(index + 1, index + len(addresses)))
     print()
-    print(",".join(addresses))
+    print(listFormat.format(",".join(itemFormat.format(address)
+                                     for address in addresses)))
     print()
-    print(",".join(str(amount) for amount in amounts))
+    print(listFormat.format(",".join(itemFormat.format(amount)
+                                     for amount in amounts)))
     print()
 
 
