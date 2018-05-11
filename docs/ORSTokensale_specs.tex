@@ -10,7 +10,7 @@
 \title{ORS Token Sale Smart Contracts}
 %\author{L. Cremer, G. Baecker, S. Joergens}
 \author{SICOS}
-\date{May 10, 2018 - internal use only} 
+\date{May 11, 2018 - internal use only} 
  
 \begin{document}
 
@@ -118,10 +118,10 @@ because $|P| = 0$ is a precondition for finalization of the token sale contract.
 
 \subsection{Finalization}
 After end of main ICO and completness of  presale the
-finalization stage takes place. $|T|$ tokens are issued to team. $|C|$ tokens are issued to company.
-$|A|$ tokens are issued to advisors. Remaining $|B|$ tokens are issued to
-company. Further miniting of tokens in token contract is disabled. Transfers
-are unpaused in token contract. The ownership of the token contract is not
+finalization stage takes place. $|T|+|C|$ tokens are issued to company wallet.
+$|A|$ tokens are issued to advisors wallet. Remaining $|B|$ tokens are issued to
+bounty wallet. Further miniting of tokens in token contract is disabled.
+Transfers are unpaused in token contract. The ownership of the token contract is not
 transferred. The token sale contract is useless from now on. The token contract
 has no owner capable of acting.
 \subsection{KYC}
@@ -167,10 +167,10 @@ Requirement & Source &Value\\\hline
 Size of $P$&\ors&tbd \\
 Address of token sale contract
 owner&\ors&tbd\\
-Address of Main ICO wallet&\ors&\tt 0xF5A4cD4E156170281880B645C2c36e4Da5610284\\
-Address of team&\ors&\tt0x6265D03b984C3e1378e42B132D2D76F5A1ccb9fF\\
-Address of advisors&\ors&\tt 0x43C954E971DB80573861baf0BDfCac1F69f8C0D5\\
-Address of company&\ors&\tt 0xF83547c41DBf888DA26d6e3F4A8C0dbA30134672\\
+Main ICO wallet&\ors&\tt 0xF5A4cD4E156170281880B645C2c36e4Da5610284\\
+Bounty wallet&\ors&\tt0x6265D03b984C3e1378e42B132D2D76F5A1ccb9fF\\
+Advisors wallet&\ors&\tt 0x43C954E971DB80573861baf0BDfCac1F69f8C0D5\\
+Company wallet&\ors&\tt 0xF83547c41DBf888DA26d6e3F4A8C0dbA30134672\\
 Eidoo wallet signer address&Eidoo&\tt 0xdd5ecefcaa0cb5d75f7b72dc9d2ce446d6d00520\\
 Second signer address&Eidoo&\tt 0x4e315e5de2abbf7b745d9628ee60e4355c0fab86\\
 
