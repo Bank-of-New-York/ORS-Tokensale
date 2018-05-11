@@ -21,7 +21,7 @@ contract ORSTokenSale is Ownable, ICOEngineInterface, KYCBase {
     uint public bonusRemaining = BONUS_CAP;
     address public companyWallet;
     address public advisorsWallet;
-    address public bonusWallet;
+    address public bountyWallet;
     ORSToken public token;
     uint public rate;
     uint public openingTime;
@@ -56,9 +56,9 @@ contract ORSTokenSale is Ownable, ICOEngineInterface, KYCBase {
     /// @param _wallet A positive number
     /// @param _companyWallet An Ethereum address
     /// @param _advisorsWallet An Ethereum address
-    /// @param _bonusWallet An Ethereum address
+    /// @param _bountyWallet An Ethereum address
     /// @param _kycSigners A list where each entry is an Ethereum address
-    constructor(ORSToken _token, uint _rate, uint _openingTime, uint _closingTime, uint _wallet, address _companyWallet, address _advisorsWallet, address _bonusWallet, address[] _kycSigners) public KYCBase(_kycSigners) {
+    constructor(ORSToken _token, uint _rate, uint _openingTime, uint _closingTime, uint _wallet, address _companyWallet, address _advisorsWallet, address _bountyWallet, address[] _kycSigners) public KYCBase(_kycSigners) {
         require(IMPLEMENTATION);
     }
 
