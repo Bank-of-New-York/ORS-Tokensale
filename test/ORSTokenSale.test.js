@@ -62,18 +62,18 @@ contract("ORSTokenSale", ([owner,
                            investor1,
                            investor2,
                            wallet,
-                           teamWallet,
-                           advisorsWallet,
                            companyWallet,
+                           advisorsWallet,
+                           bountyWallet,
                            anyone]) => {
     //                               M  k  1
     const TOKEN_CAP      = new BN("833333333e18");
     const PRESALE_CAP    = new BN("250000000e18");
     const MAINSALE_CAP   = new BN("250000000e18");
     const BONUS_CAP      = new BN( "64460000e18");
+    const COMPANY_SHARE  = new BN("127206667e18");
     const TEAM_SHARE     = new BN( "83333333e18");
     const ADVISORS_SHARE = new BN( "58333333e18");
-    const COMPANY_SHARE  = new BN("127206667e18");
 
     // Helper function: default deployment parameters
     const defaultParams = () => {
@@ -83,9 +83,9 @@ contract("ORSTokenSale", ([owner,
                 openingTime: blockTime + duration.days(1),
                 closingTime: blockTime + duration.days(3),
                 wallet,
-                teamWallet,
                 companyWallet,
                 advisorsWallet,
+                bountyWallet,
                 kycSigners: [eidooSigner, otherSigner]};
     };
 
@@ -120,9 +120,9 @@ contract("ORSTokenSale", ([owner,
                                 params.openingTime,
                                 params.closingTime,
                                 params.wallet,
-                                params.teamWallet,
-                                params.advisorsWallet,
                                 params.companyWallet,
+                                params.advisorsWallet,
+                                params.bountyWallet,
                                 params.kycSigners,
                                 {from: owner});
     };
@@ -144,7 +144,7 @@ contract("ORSTokenSale", ([owner,
 
             it("fails if token cap doesn't equal sum of total pool amounts", async () => {
                 const tokenCap = PRESALE_CAP.plus(MAINSALE_CAP).plus(BONUS_CAP)
-                                            .plus(TEAM_SHARE).plus(ADVISORS_SHARE).plus(COMPANY_SHARE)
+                                            .plus(COMPANY_SHARE).plus(TEAM_SHARE).plus(ADVISORS_SHARE)
                                             .plus(1);
                 await rejectDeploy(deployTokenSale({tokenCap}));
             });
@@ -165,16 +165,16 @@ contract("ORSTokenSale", ([owner,
                 await rejectDeploy(deployTokenSale({wallet: 0x0}));
             });
 
-            it("fails if team wallet address is zero", async () => {
-                await rejectDeploy(deployTokenSale({teamWallet: 0x0}));
+            it("fails if company wallet address is zero", async () => {
+                await rejectDeploy(deployTokenSale({companyWallet: 0x0}));
             });
 
             it("fails if advisors wallet address is zero", async () => {
                 await rejectDeploy(deployTokenSale({advisorsWallet: 0x0}));
             });
 
-            it("fails if company wallet address is zero", async () => {
-                await rejectDeploy(deployTokenSale({companyWallet: 0x0}));
+            it("fails if bounty wallet address is zero", async () => {
+                await rejectDeploy(deployTokenSale({bountyWallet: 0x0}));
             });
 
             it("fails if there are no KYC signers", async () => {
@@ -218,16 +218,16 @@ contract("ORSTokenSale", ([owner,
                 expect(await sale.wallet()).to.be.bignumber.equal(params.wallet);
             });
 
-            it("sets correct team wallet address", async () => {
-                expect(await sale.teamWallet()).to.be.bignumber.equal(params.teamWallet);
+            it("sets correct company wallet address", async () => {
+                expect(await sale.companyWallet()).to.be.bignumber.equal(params.companyWallet);
             });
 
             it("sets correct advisors wallet address", async () => {
                 expect(await sale.advisorsWallet()).to.be.bignumber.equal(params.advisorsWallet);
             });
 
-            it("sets correct company wallet address", async () => {
-                expect(await sale.companyWallet()).to.be.bignumber.equal(params.companyWallet);
+            it("sets correct bounty wallet address", async () => {
+                expect(await sale.bountyWallet()).to.be.bignumber.equal(params.bountyWallet);
             });
 
             it("sets correct eidoo signer address", async () => {
@@ -646,15 +646,15 @@ contract("ORSTokenSale", ([owner,
 
         describe("finalizing", () => {
             let totalSupply;
-            let teamBalance;
-            let advisorsBalance;
             let companyBalance;
+            let advisorsBalance;
+            let bonusBalance;
             let bonusRemaining;
 
-            before("save team, advisors, company balances", async () => {
-                teamBalance = await token.balanceOf(teamWallet);
-                advisorsBalance = await token.balanceOf(advisorsWallet);
+            before("save company, advisors, bounty wallet balances", async () => {
                 companyBalance = await token.balanceOf(companyWallet);
+                advisorsBalance = await token.balanceOf(advisorsWallet);
+                bonusBalance = await token.balanceOf(bountyWallet);
             });
 
             it("is forbidden if there are remaining presale tokens", async () => {
@@ -676,13 +676,14 @@ contract("ORSTokenSale", ([owner,
                 expect(await sale.isFinalized()).to.be.true;
             });
 
-            it("increases token supply by team, advisors, company share and remaining bonus tokens", async () => {
+            it("increases token supply by company, team, advisors share and remaining bonus tokens", async () => {
                 expect(await token.totalSupply()).to.be.bignumber.equal(
-                    totalSupply.plus(TEAM_SHARE).plus(ADVISORS_SHARE).plus(COMPANY_SHARE).plus(bonusRemaining));
+                    totalSupply.plus(COMPANY_SHARE).plus(TEAM_SHARE).plus(ADVISORS_SHARE).plus(bonusRemaining));
             });
 
-            it("mints team share for the benefit of team wallet", async () => {
-                expect(await token.balanceOf(teamWallet)).to.be.bignumber.equal(teamBalance.plus(TEAM_SHARE));
+            it("mints company and team share for the benefit of company wallet", async () => {
+                expect(await token.balanceOf(companyWallet)).to.be.bignumber.equal(
+                    companyBalance.plus(COMPANY_SHARE).plus(TEAM_SHARE));
             });
 
             it("mints advisors share for the benefit of advisors wallet", async () => {
@@ -690,11 +691,10 @@ contract("ORSTokenSale", ([owner,
                     advisorsBalance.plus(ADVISORS_SHARE));
             });
 
-            it("mints company share and remaing bonus tokens for the benefit of company wallet", async () => {
-                expect(await token.balanceOf(companyWallet)).to.be.bignumber.equal(
-                    companyBalance.plus(COMPANY_SHARE).plus(bonusRemaining));
+            it("mints remaining bonus tokens for the benefit of bounty wallet", async () => {
+                expect(await token.balanceOf(bountyWallet)).to.be.bignumber.equal(
+                    bonusBalance.plus(bonusRemaining));
             });
-
             it("decreases remaining bonus tokens to zero", async () => {
                 expect(await sale.bonusRemaining()).to.be.zero;
             });
@@ -732,9 +732,9 @@ contract("ORSTokenSale", ([owner,
             log("total supply         = " + format(await token.totalSupply()));
             log("balance of buyers    = " + format(await token.balanceOf(buyer)));
             log("balance of investors = " + format(await token.balanceOf(investor1)));
-            log("balance of team      = " + format(await token.balanceOf(teamWallet)));
-            log("balance of advisors  = " + format(await token.balanceOf(advisorsWallet)));
             log("balance of company   = " + format(await token.balanceOf(companyWallet)));
+            log("balance of advisors  = " + format(await token.balanceOf(advisorsWallet)));
+            log("balance of bonus     = " + format(await token.balanceOf(bountyWallet)));
             log("remaining presale    = " + format(await sale.presaleRemaining()));
             log("remaining mainsale   = " + format(await sale.mainsaleRemaining()));
             log("remaining bonus      = " + format(await sale.bonusRemaining()));

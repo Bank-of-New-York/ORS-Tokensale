@@ -13,15 +13,15 @@ contract ORSTokenSale is Ownable, ICOEngineInterface, KYCBase {
     uint public PRESALE_CAP = 250000000e18;
     uint public MAILSALE_CAP = 500000000e18 - PRESALE_CAP;
     uint public BONUS_CAP = 64460000e18;
+    uint public COMPANY_SHARE = 127206667e18;
     uint public TEAM_SHARE = 83333333e18;
     uint public ADVISORS_SHARE = 58333333e18;
-    uint public COMPANY_SHARE = 127206667e18;
     uint public mainsaleRemaining = MAINSALE_CAP;
     uint public presaleRemaining = PRESALE_CAP;
     uint public bonusRemaining = BONUS_CAP;
-    address public teamWallet;
     address public companyWallet;
     address public advisorsWallet;
+    address public bonusWallet;
     ORSToken public token;
     uint public rate;
     uint public openingTime;
@@ -54,11 +54,11 @@ contract ORSTokenSale is Ownable, ICOEngineInterface, KYCBase {
     /// @param _openingTime A positive number
     /// @param _closingTime A positive number
     /// @param _wallet A positive number
-    /// @param _teamWallet An Ethereum address
-    /// @param _advisorsWallet An Ethereum address
     /// @param _companyWallet An Ethereum address
+    /// @param _advisorsWallet An Ethereum address
+    /// @param _bonusWallet An Ethereum address
     /// @param _kycSigners A list where each entry is an Ethereum address
-    constructor(ORSToken _token, uint _rate, uint _openingTime, uint _closingTime, uint _wallet, address _teamWallet, address _advisorsWallet, address _companyWallet, address[] _kycSigners) public KYCBase(_kycSigners) {
+    constructor(ORSToken _token, uint _rate, uint _openingTime, uint _closingTime, uint _wallet, address _companyWallet, address _advisorsWallet, address _bonusWallet, address[] _kycSigners) public KYCBase(_kycSigners) {
         require(IMPLEMENTATION);
     }
 

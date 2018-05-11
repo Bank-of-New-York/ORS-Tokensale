@@ -20,9 +20,9 @@ contract ORSTokenSale is KYCBase, ICOEngineInterface, Ownable {
     uint constant public BONUS_CAP = 64460000e18;                    //  64,460,000 e18
 
     // Granted token shares that will be minted upon finalization
+    uint constant public COMPANY_SHARE = 127206667e18;               // 127,206,667 e18
     uint constant public TEAM_SHARE = 83333333e18;                   //  83,333,333 e18
     uint constant public ADVISORS_SHARE = 58333333e18;               //  58,333,333 e18
-    uint constant public COMPANY_SHARE = 127206667e18;               // 127,206,667 e18
 
     // Remaining token amounts of each pool
     uint public presaleRemaining = PRESALE_CAP;
@@ -30,9 +30,9 @@ contract ORSTokenSale is KYCBase, ICOEngineInterface, Ownable {
     uint public bonusRemaining = BONUS_CAP;
 
     // Beneficiaries of granted token shares
-    address public teamWallet;
-    address public advisorsWallet;
     address public companyWallet;
+    address public advisorsWallet;
+    address public bountyWallet;
 
     ORSToken public token;
 
@@ -75,9 +75,9 @@ contract ORSTokenSale is KYCBase, ICOEngineInterface, Ownable {
     /// @param _openingTime Block (Unix) timestamp of mainsale start time
     /// @param _closingTime Block (Unix) timestamp of mainsale latest end time
     /// @param _wallet Ethereum account who will receive sent ether upon token purchase during mainsale
-    /// @param _teamWallet Ethereum account of team who will receive team share upon finalization
-    /// @param _advisorsWallet Ethereum account of advisors who will receive advisors share upon finalization
     /// @param _companyWallet Ethereum account of company who will receive company share upon finalization
+    /// @param _advisorsWallet Ethereum account of advisors who will receive advisors share upon finalization
+    /// @param _bountyWallet Ethereum account of a wallet that will receive remaining bonus upon finalization
     /// @param _kycSigners List of KYC signers' Ethereum addresses
     constructor(
         ORSToken _token,
@@ -85,20 +85,20 @@ contract ORSTokenSale is KYCBase, ICOEngineInterface, Ownable {
         uint _openingTime,
         uint _closingTime,
         address _wallet,
-        address _teamWallet,
-        address _advisorsWallet,
         address _companyWallet,
+        address _advisorsWallet,
+        address _bountyWallet,
         address[] _kycSigners
     )
         public
         KYCBase(_kycSigners)
     {
         require(_token != address(0x0));
-        require(_token.cap() == PRESALE_CAP + MAINSALE_CAP + BONUS_CAP + TEAM_SHARE + ADVISORS_SHARE + COMPANY_SHARE);
+        require(_token.cap() == PRESALE_CAP + MAINSALE_CAP + BONUS_CAP + COMPANY_SHARE + TEAM_SHARE + ADVISORS_SHARE);
         require(_rate > 0);
         require(_openingTime > now && _closingTime > _openingTime);
         require(_wallet != address(0x0));
-        require(_teamWallet != address(0x0) && _companyWallet != address(0x0) && _advisorsWallet != address(0x0));
+        require(_companyWallet != address(0x0) && _advisorsWallet != address(0x0) && _bountyWallet != address(0x0));
         require(_kycSigners.length >= 2);
 
         token = _token;
@@ -106,9 +106,9 @@ contract ORSTokenSale is KYCBase, ICOEngineInterface, Ownable {
         openingTime = _openingTime;
         closingTime = _closingTime;
         wallet = _wallet;
-        teamWallet = _teamWallet;
-        advisorsWallet = _advisorsWallet;
         companyWallet = _companyWallet;
+        advisorsWallet = _advisorsWallet;
+        bountyWallet = _bountyWallet;
 
         eidooSigner = _kycSigners[0];
     }
@@ -145,15 +145,14 @@ contract ORSTokenSale is KYCBase, ICOEngineInterface, Ownable {
         require(presaleRemaining == 0);
 
         // Distribute granted token shares
-        token.mint(teamWallet, TEAM_SHARE);
+        token.mint(companyWallet, COMPANY_SHARE + TEAM_SHARE);
         token.mint(advisorsWallet, ADVISORS_SHARE);
-        token.mint(companyWallet, COMPANY_SHARE);
 
         // There shouldn't be any remaining presale tokens
         // Remaining mainsale tokens will be lost (i.e. not minted)
-        // Remaining bonus tokens will be minted for the benefit of company
+        // Remaining bonus tokens will be minted for the benefit of bounty wallet
         if (bonusRemaining > 0) {
-            token.mint(companyWallet, bonusRemaining);
+            token.mint(bountyWallet, bonusRemaining);
             bonusRemaining = 0;
         }
 
