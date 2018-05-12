@@ -68,9 +68,9 @@ contract("ORSTokenSale", ([owner,
                            anyone]) => {
     //                               M  k  1
     const TOKEN_CAP      = new BN("833333333e18");
-    const PRESALE_CAP    = new BN("250000000e18");
-    const MAINSALE_CAP   = new BN("250000000e18");
-    const BONUS_CAP      = new BN( "64460000e18");
+    const PRESALE_CAP    = new BN("222247844e18");
+    const MAINSALE_CAP   = new BN("281945791e18");
+    const BONUS_CAP      = new BN( "60266365e18");
     const COMPANY_SHARE  = new BN("127206667e18");
     const TEAM_SHARE     = new BN( "83333333e18");
     const ADVISORS_SHARE = new BN( "58333333e18");

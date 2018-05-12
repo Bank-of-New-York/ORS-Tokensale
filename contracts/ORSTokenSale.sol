@@ -15,14 +15,14 @@ contract ORSTokenSale is KYCBase, ICOEngineInterface, Ownable {
 
     // Maximum token amounts of each pool
     // Note: BONUS_CAP should be at least 5% of MAINSALE_CAP
-    uint constant public PRESALE_CAP = 250000000e18;                 // 250,000,000 e18
-    uint constant public MAINSALE_CAP = 500000000e18 - PRESALE_CAP;  // 250,000,000 e18
-    uint constant public BONUS_CAP = 64460000e18;                    //  64,460,000 e18
+    uint constant public PRESALE_CAP = 222247844e18;    // 222,247,844 e18
+    uint constant public MAINSALE_CAP = 281945791e18;   // 281,945,791 e18
+    uint constant public BONUS_CAP = 60266365e18;       //  60,266,365 e18
 
     // Granted token shares that will be minted upon finalization
-    uint constant public COMPANY_SHARE = 127206667e18;               // 127,206,667 e18
-    uint constant public TEAM_SHARE = 83333333e18;                   //  83,333,333 e18
-    uint constant public ADVISORS_SHARE = 58333333e18;               //  58,333,333 e18
+    uint constant public COMPANY_SHARE = 127206667e18;  // 127,206,667 e18
+    uint constant public TEAM_SHARE = 83333333e18;      //  83,333,333 e18
+    uint constant public ADVISORS_SHARE = 58333333e18;  //  58,333,333 e18
 
     // Remaining token amounts of each pool
     uint public presaleRemaining = PRESALE_CAP;
