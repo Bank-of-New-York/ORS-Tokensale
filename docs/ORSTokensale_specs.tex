@@ -10,7 +10,7 @@
 \title{ORS Token Sale Smart Contracts}
 %\author{L. Cremer, G. Baecker, S. Joergens}
 \author{SICOS}
-\date{May 11, 2018 - internal use only} 
+\date{May 12, 2018 - internal use only} 
  
 \begin{document}
 
@@ -74,9 +74,9 @@ mint tokens from an empty pool will revert the whole transaction.
 
 
 Pool & & Cap & Drained \\\hline
-Presale & $P$ &  tbd& any time before finalization\\
-Main ICO & $M$ &500,000,000 - $|P|$&between start  and end date if ICO\\
-Bonus & $B$ & 64,460,000& together with $M$ and at finalization\\
+Presale & $P$ &222,247,844& any time before finalization\\
+Main ICO & $M$ &281,945,791&between start  and end date if ICO\\
+Bonus & $B$ & 60,266,365& together with $M$ and at finalization\\
 Team &  $T$ & 83,333,333& at finalization \\
 Company &  $C$ & 127,206,667& at finalization\\
 Advisors &  $A$ & 58,333,333& at finalization\\\hline
@@ -164,9 +164,9 @@ The following requirements have to be fulfilled at deployment time 2018-05-11:
 \begin{tabular}{r|l|l}
 
 Requirement & Source &Value\\\hline
-Size of $P$&\ors&tbd \\
-Address of token sale contract
-owner&\ors&tbd\\
+Size of $P$ and $M$&\ors&see above \\
+Initial token sale contract
+owner&SICOS&\tt 0x6aA5a27132f2A828350e06Fb20e04e7E5e205e9A\\
 Main ICO wallet&\ors&\tt 0xF5A4cD4E156170281880B645C2c36e4Da5610284\\
 Bounty wallet&\ors&\tt0x6265D03b984C3e1378e42B132D2D76F5A1ccb9fF\\
 Advisors wallet&\ors&\tt 0x43C954E971DB80573861baf0BDfCac1F69f8C0D5\\
