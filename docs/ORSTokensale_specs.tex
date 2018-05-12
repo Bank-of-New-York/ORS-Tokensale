@@ -7,19 +7,22 @@
 \newcommand{\ors}{{\sf ORS}}
 \newcommand{\orsT}{{\sf ORS Token}}
 
-\title{ORS Token Sale Smart Contracts}
-%\author{L. Cremer, G. Baecker, S. Joergens}
-\author{SICOS}
-\date{May 12, 2018 - internal use only} 
- 
+
+
 \begin{document}
 
+\title{ORS Token Sale Smart Contracts}
+%\author{L. Cremer, G. Baecker, S. Joergens}
+\author{SICOS internal use only}
+%\date{May 12, 2018 - internal use only} 
+\date{\today}
+
+
+
 \maketitle
-
-
+ 
  \begin{abstract}
- Latest changes to contract specifications of the ORS tokensale during audit
- phase.\\\\
+
  The ORS tokensale contains of two smart contracts. The token contract is an standard contract from the Open
  Zeppelin library. The token sale contract is minting tokens directly to the
  addresses of the investors. There will be a KYC process done by an KYC service
@@ -28,6 +31,7 @@
  \end{abstract}
 
 \section{Token Contract}
+Token contract address is {\tt 0xac2e58A06E6265F1Cf5084EE58da68e5d75b49CA}\\\\
 The token contract implements a ERC20 standard token. It is named \orsT.
 Ticker symbol will be \ors. The number of decimals will be 18 to keep the
 \ors \ resolution  identical to \ether. \\\\
@@ -54,14 +58,15 @@ ownership of the token contract is transfered to the token sale contract immedia
 Token can be irreversibly burned (destroyed) by the token holder at any time.
 
 \section{Token Sale Contract}
+Token contract address is {\tt 0x3f45Fd00781028191082cC8A28aB9C178BBe0B7E}\\\\
 The token sale contracts implements the Eidoo 
 ICOEngineInterface
 \footnote{https://github.com/eidoo/icoengine/blob/master/contracts/ICOEngineInterface.sol} 
  to provide the Eidoo app with informations on the ICO status.\\\\ 
  The token sale contract provides a function that enables the token contract owner to set the \orsT \ price at any time. 
  The price represents the \ors  \ per \ether \ rate. With a target price of
- $0.05$ \euro \ per \ors \ we will have a rate of $\approx 13,000$ according to
- a  price of $\approx 650$ \euro \ per \ether. \\\\ Tokens are issued
+ $0.05$ \euro \ per \ors \ we will have a rate of $\approx 11,420$ according to
+ a  price of $\approx 571$ \euro \ per \ether. \\\\ Tokens are issued
  immediatly within the transaction receiving the \ether \ payment.
 \\\\
 \noindent
@@ -140,15 +145,16 @@ The first belongs to Eidoo wallet investors and will provide 5 \% bonus tokens. 
 
 \begin{center}
 \begin{table}[h]
-\begin{tabular}{r|l}
+\begin{tabular}{r|l|c}
 
-Date & Event \\\hline
-$\approx$ 2018-05-11&Token contract deployment \\
-&Token sale contract deployment \\
-&Transfer of token contract ownership to token sale contract \\
-&Etherscan code verification \\
+Date & Event& State \\\hline
+$\approx$ 2018-05-11&Token contract deployment&done \\
+&Etherscan code verification&done \\
+&Token sale contract deployment&done \\
+&Etherscan code verification &done\\
+&Transfer of token contract ownership to token sale contract&pending \\
+&Issuing of presale tokens&pending\\
 &Transfer of ownership of token sale contract to \ors\\
-& Issuing of presale tokens start\\
 2018-05-14& Main ICO start\\
 $<=$ 2018-05-26& Main ICO end\\
 $\approx$ 2018-05-27& Finalization of token sale contract\\
@@ -169,8 +175,8 @@ Requirement & Source &Value\\\hline
 Size of $P$ and $M$&\ors&see above \\
 Initial token sale contract
 owner&SICOS&\tt 0x6aA5a27132f2A828350e06Fb20e04e7E5e205e9A\\
-Main ICO wallet&\ors&\tt 0xF5A4cD4E156170281880B645C2c36e4Da5610284\\
-Bounty wallet&\ors&\tt0x6265D03b984C3e1378e42B132D2D76F5A1ccb9fF\\
+Main ICO \ether \ wallet&\ors&\tt 0xF5A4cD4E156170281880B645C2c36e4Da5610284\\
+Bounty wallet&\ors&\tt 0x6265D03b984C3e1378e42B132D2D76F5A1ccb9fF\\
 Advisors wallet&\ors&\tt 0x43C954E971DB80573861baf0BDfCac1F69f8C0D5\\
 Company wallet&\ors&\tt 0xF83547c41DBf888DA26d6e3F4A8C0dbA30134672\\
 Eidoo wallet signer address&Eidoo&\tt 0xdd5ecefcaa0cb5d75f7b72dc9d2ce446d6d00520\\
